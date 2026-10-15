@@ -15,7 +15,7 @@
       -webkit-user-select: none;
       -webkit-tap-highlight-color: transparent;
     }
-    button {
+    button, input, select, textarea {
       -webkit-tap-highlight-color: transparent;
     }
     .ticket-paper {
@@ -29,6 +29,9 @@
     
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    .tab-section { display: none; }
+    .tab-section.active { display: flex; }
 
     @media print {
       body * { visibility: hidden; }
@@ -68,7 +71,7 @@
   <main class="flex-1 overflow-hidden relative">
     
     <!-- SECTION 1: VENTAS (POS) -->
-    <section id="tab-sales" class="h-full flex flex-col p-3 space-y-3">
+    <section id="tab-sales" class="tab-section active h-full flex-col p-3 space-y-3">
       <!-- Search & Category Filters -->
       <div class="space-y-2 shrink-0">
         <div class="relative">
@@ -76,13 +79,13 @@
           <input type="text" id="search-product" placeholder="Buscar producto..." class="w-full bg-slate-800 border border-slate-700 rounded-xl pl-9 pr-4 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
         </div>
         <div id="categories-bar" class="flex space-x-2 overflow-x-auto no-scrollbar py-1">
-          <!-- Categorías generadas dinámicamente -->
+          <!-- Categorías -->
         </div>
       </div>
 
       <!-- Main Sales Content: Grid + Cart Split -->
       <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-3 overflow-hidden">
-        <!-- Products Grid (Minimalist Cards) -->
+        <!-- Products Grid -->
         <div class="overflow-y-auto no-scrollbar pr-1">
           <div id="products-grid" class="grid grid-cols-2 gap-2">
             <!-- Cards de productos -->
@@ -96,7 +99,7 @@
             <button onclick="clearCart()" class="text-xs text-rose-400 hover:text-rose-300 font-medium">Vaciar</button>
           </div>
 
-          <!-- Customer Input (Sin Teléfono) -->
+          <!-- Customer Input -->
           <div class="p-2 border-b border-slate-700 bg-slate-800/50 shrink-0">
             <div class="relative">
               <i class="fa-solid fa-user absolute left-3 top-2.5 text-slate-400 text-xs"></i>
@@ -125,15 +128,13 @@
       </div>
     </section>
 
-    <!-- SECTION 2: INVENTARIO / PRODUCTOS -->
-    <section id="tab-inventory" class="h-full hidden flex-col p-3 space-y-3 overflow-y-auto">
+    <!-- SECTION 2: PRODUCTOS -->
+    <section id="tab-inventory" class="tab-section h-full flex-col p-3 space-y-3 overflow-y-auto">
       <div class="flex justify-between items-center shrink-0">
-        <div class="flex items-center space-x-2">
-          <button onclick="openProductModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-3 py-2 rounded-lg flex items-center space-x-1 shadow">
-            <i class="fa-solid fa-plus"></i>
-            <span>Nuevo Producto</span>
-          </button>
-        </div>
+        <button onclick="openProductModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-3 py-2 rounded-lg flex items-center space-x-1 shadow">
+          <i class="fa-solid fa-plus"></i>
+          <span>Nuevo Producto</span>
+        </button>
       </div>
 
       <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden shadow-md">
@@ -155,8 +156,8 @@
       </div>
     </section>
 
-    <!-- SECTION 3: REPORTES / LIBRO DE VENTAS -->
-    <section id="tab-reports" class="h-full hidden flex-col p-3 space-y-3 overflow-y-auto">
+    <!-- SECTION 3: REPORTES -->
+    <section id="tab-reports" class="tab-section h-full flex-col p-3 space-y-3 overflow-y-auto">
       <div class="flex flex-col gap-2 shrink-0">
         <div class="grid grid-cols-2 gap-2">
           <div><label class="block text-[10px] text-slate-400 mb-1">Desde</label><input type="date" id="report-date-from" onchange="renderReports()" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white"></div>
@@ -171,7 +172,6 @@
         </div>
       </div>
 
-      <!-- Tarjetas reducidas -->
       <div class="grid grid-cols-2 gap-2 shrink-0">
         <div class="bg-slate-800 p-2.5 rounded-xl border border-slate-700"><p class="text-[10px] text-slate-400">Venta del periodo</p><p id="report-total-sales" class="text-base font-bold text-emerald-400">$0.00</p></div>
         <div class="bg-slate-800 p-2.5 rounded-xl border border-slate-700"><p class="text-[10px] text-slate-400">Número de ventas</p><p id="report-sale-count" class="text-base font-bold text-white">0</p></div>
@@ -194,7 +194,7 @@
     </section>
 
     <!-- SECTION 4: CLIENTES -->
-    <section id="tab-customers" class="h-full hidden flex-col p-3 space-y-3 overflow-y-auto mb-4">
+    <section id="tab-customers" class="tab-section h-full flex-col p-3 space-y-3 overflow-y-auto mb-4">
       <div class="bg-slate-800 border border-slate-700 rounded-xl p-3 space-y-2">
         <input type="hidden" id="client-id">
         <label class="block text-xs text-slate-400">Nombre del negocio o cliente *</label><input id="client-name" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm" placeholder="Ej. Abarrotes Lupita">
@@ -209,21 +209,21 @@
 
   </main>
 
-  <!-- NAVIGATION BAR CON POINTER-EVENTS FIX PARA ANDROID -->
-  <nav class="bg-slate-800 border-t border-slate-700 px-2 py-1.5 flex justify-around items-center text-xs shrink-0">
-    <button onclick="switchTab('sales')" id="nav-sales" class="flex flex-col items-center p-1.5 text-indigo-400 font-bold">
+  <!-- NAVIGATION BAR ROBUSTA -->
+  <nav class="bg-slate-800 border-t border-slate-700 px-2 py-1.5 flex justify-around items-center text-xs shrink-0 z-10">
+    <button onclick="switchTab('sales')" id="nav-sales" class="nav-btn flex flex-col items-center p-1.5 text-indigo-400 font-bold">
       <i class="fa-solid fa-store text-base mb-0.5 pointer-events-none"></i>
       <span class="pointer-events-none">Ventas</span>
     </button>
-    <button onclick="switchTab('inventory')" id="nav-inventory" class="flex flex-col items-center p-1.5 text-slate-400">
+    <button onclick="switchTab('inventory')" id="nav-inventory" class="nav-btn flex flex-col items-center p-1.5 text-slate-400">
       <i class="fa-solid fa-boxes-stacked text-base mb-0.5 pointer-events-none"></i>
       <span class="pointer-events-none">Productos</span>
     </button>
-    <button onclick="switchTab('reports')" id="nav-reports" class="flex flex-col items-center p-1.5 text-slate-400">
+    <button onclick="switchTab('reports')" id="nav-reports" class="nav-btn flex flex-col items-center p-1.5 text-slate-400">
       <i class="fa-solid fa-chart-line text-base mb-0.5 pointer-events-none"></i>
       <span class="pointer-events-none">Reportes</span>
     </button>
-    <button onclick="switchTab('customers')" id="nav-customers" class="flex flex-col items-center p-1.5 text-slate-400">
+    <button onclick="switchTab('customers')" id="nav-customers" class="nav-btn flex flex-col items-center p-1.5 text-slate-400">
       <i class="fa-solid fa-users text-base mb-0.5 pointer-events-none"></i>
       <span class="pointer-events-none">Clientes</span>
     </button>
@@ -410,41 +410,60 @@
       loadTicketConfigForm();
       
       const today = new Date().toISOString().split('T')[0];
-      document.getElementById('report-date-from').value = today;
-      document.getElementById('report-date-to').value = today;
+      const fromEl = document.getElementById('report-date-from');
+      const toEl = document.getElementById('report-date-to');
+      if (fromEl) fromEl.value = today;
+      if (toEl) toEl.value = today;
+      
       renderReports();
       renderCustomers();
       refreshCustomerSuggestions();
     });
 
+    // CAMBIO DE PESTAÑAS DIRECTO Y ROBUSTO
     function switchTab(tab) {
-      ['sales', 'inventory', 'reports', 'customers'].forEach(t => {
-        const tabEl = document.getElementById(`tab-${t}`);
-        const navEl = document.getElementById(`nav-${t}`);
-        if(tabEl) { tabEl.classList.add('hidden'); tabEl.classList.remove('flex'); }
-        if(navEl) { navEl.classList.remove('text-indigo-400', 'font-bold'); navEl.classList.add('text-slate-400'); }
+      // Ocultar todas las secciones
+      document.querySelectorAll('.tab-section').forEach(sec => {
+        sec.classList.remove('active');
       });
 
-      const activeTab = document.getElementById(`tab-${tab}`);
-      const activeNav = document.getElementById(`nav-${tab}`);
-      if(activeTab) { activeTab.classList.remove('hidden'); activeTab.classList.add('flex'); }
-      if(activeNav) { activeNav.classList.add('text-indigo-400', 'font-bold'); activeNav.classList.remove('text-slate-400'); }
+      // Desactivar todos los botones de navegación
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('text-indigo-400', 'font-bold');
+        btn.classList.add('text-slate-400');
+      });
 
+      // Activar sección solicitada
+      const targetSec = document.getElementById(`tab-${tab}`);
+      if (targetSec) {
+        targetSec.classList.add('active');
+      }
+
+      // Activar botón solicitado
+      const targetNav = document.getElementById(`nav-${tab}`);
+      if (targetNav) {
+        targetNav.classList.add('text-indigo-400', 'font-bold');
+        targetNav.classList.remove('text-slate-400');
+      }
+
+      // Actualizar datos de la pestaña abierta
       if (tab === 'reports') renderReports();
       if (tab === 'customers') renderCustomers();
       if (tab === 'inventory') renderInventory();
     }
 
     function openTicketConfigModal() {
-      document.getElementById('modal-ticket-config').classList.remove('hidden');
-      document.getElementById('modal-ticket-config').classList.add('flex');
+      const modal = document.getElementById('modal-ticket-config');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
       loadTicketConfigForm();
       updateTicketPreview();
     }
 
     function closeTicketConfigModal() {
-      document.getElementById('modal-ticket-config').classList.add('hidden');
-      document.getElementById('modal-ticket-config').classList.remove('flex');
+      const modal = document.getElementById('modal-ticket-config');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
     }
 
     function renderCategoriesBar() {
@@ -464,7 +483,7 @@
     }
 
     function renderProductsGrid() {
-      const search = document.getElementById('search-product').value.toLowerCase();
+      const search = (document.getElementById('search-product')?.value || '').toLowerCase();
       const filtered = products.filter(p => {
         const matchesCat = selectedCategory === 'Todos' || p.category === selectedCategory;
         const matchesSearch = p.name.toLowerCase().includes(search);
@@ -479,7 +498,8 @@
       `).join('');
     }
 
-    document.getElementById('search-product').addEventListener('input', renderProductsGrid);
+    const searchInput = document.getElementById('search-product');
+    if (searchInput) searchInput.addEventListener('input', renderProductsGrid);
 
     function addToCart(productId) {
       const prod = products.find(p => p.id === productId);
@@ -922,14 +942,18 @@
       if (period === 'today') from = to;
       else if (period === 'week') { const d = new Date(now); d.setDate(d.getDate()-6); from = localIso(d); }
       else if (period === 'month') from = localIso(new Date(now.getFullYear(), now.getMonth(), 1));
-      document.getElementById('report-date-from').value = from;
-      document.getElementById('report-date-to').value = to;
+      
+      const fromEl = document.getElementById('report-date-from');
+      const toEl = document.getElementById('report-date-to');
+      if (fromEl) fromEl.value = from;
+      if (toEl) toEl.value = to;
+      
       renderReports();
     }
 
     function renderReports() {
-      const from = document.getElementById('report-date-from').value;
-      const to = document.getElementById('report-date-to').value;
+      const from = document.getElementById('report-date-from')?.value || '';
+      const to = document.getElementById('report-date-to')?.value || '';
       const query = (document.getElementById('report-search')?.value || '').trim().toLocaleLowerCase('es-MX');
       const periodSales = sales.filter(s => (!from || s.dateIso >= from) && (!to || s.dateIso <= to));
       const filteredSales = periodSales.filter(s => {
@@ -953,27 +977,36 @@
           p.qty += Number(i.qty) || 0; p.total += (Number(i.qty) || 0) * (Number(i.price) || 0); productMap.set(key, p);
         });
       });
-      document.getElementById('report-total-sales').innerText = `$${totalSales.toFixed(2)}`;
-      document.getElementById('report-sale-count').innerText = filteredSales.length;
+      
+      const totalSalesEl = document.getElementById('report-total-sales');
+      const saleCountEl = document.getElementById('report-sale-count');
+      if (totalSalesEl) totalSalesEl.innerText = `$${totalSales.toFixed(2)}`;
+      if (saleCountEl) saleCountEl.innerText = filteredSales.length;
 
       const productBody = document.getElementById('report-products-body');
-      const bestProducts = [...productMap.values()].sort((a,b) => b.qty-a.qty);
-      productBody.innerHTML = bestProducts.length ? bestProducts.map(p => `<tr><td class="p-2 font-semibold">${escapeHtml(p.name)}</td><td class="p-2">${p.qty}</td><td class="p-2 text-emerald-400">$${p.total.toFixed(2)}</td></tr>`).join('') : '<tr><td colspan="3" class="p-3 text-center text-slate-500">Sin productos.</td></tr>';
+      if (productBody) {
+        const bestProducts = [...productMap.values()].sort((a,b) => b.qty-a.qty);
+        productBody.innerHTML = bestProducts.length ? bestProducts.map(p => `<tr><td class="p-2 font-semibold">${escapeHtml(p.name)}</td><td class="p-2">${p.qty}</td><td class="p-2 text-emerald-400">$${p.total.toFixed(2)}</td></tr>`).join('') : '<tr><td colspan="3" class="p-3 text-center text-slate-500">Sin productos.</td></tr>';
+      }
 
       const customerBody = document.getElementById('report-customers-body');
-      const bestCustomers = [...customerMap.values()].sort((a,b) => b.total-a.total);
-      customerBody.innerHTML = bestCustomers.length ? bestCustomers.map(c => `<tr><td class="p-2 font-semibold">${escapeHtml(c.name)}</td><td class="p-2">${escapeHtml(c.phone)}</td><td class="p-2">${c.count}</td><td class="p-2 text-emerald-400">$${c.total.toFixed(2)}</td></tr>`).join('') : '<tr><td colspan="4" class="p-3 text-center text-slate-500">Sin clientes.</td></tr>';
+      if (customerBody) {
+        const bestCustomers = [...customerMap.values()].sort((a,b) => b.total-a.total);
+        customerBody.innerHTML = bestCustomers.length ? bestCustomers.map(c => `<tr><td class="p-2 font-semibold">${escapeHtml(c.name)}</td><td class="p-2">${escapeHtml(c.phone)}</td><td class="p-2">${c.count}</td><td class="p-2 text-emerald-400">$${c.total.toFixed(2)}</td></tr>`).join('') : '<tr><td colspan="4" class="p-3 text-center text-slate-500">Sin clientes.</td></tr>';
+      }
 
       const tbody = document.getElementById('reports-table-body');
-      if (!filteredSales.length) { tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-slate-500">Sin ventas en este periodo.</td></tr>'; return; }
-      tbody.innerHTML = [...filteredSales].sort((a,b) => (b.dateIso || '').localeCompare(a.dateIso || '') || Number(b.id)-Number(b.id)).map(s => `
-        <tr onclick="openSaleDetailModal('${String(s.id).replace(/'/g, '')}')" class="hover:bg-slate-700/50 cursor-pointer">
-          <td class="p-2.5 text-slate-300">${escapeHtml(s.dateFormatted || s.dateIso || '')}</td>
-          <td class="p-2.5 font-bold text-white">${escapeHtml(s.customer || 'Cliente Frecuente')}</td>
-          <td class="p-2.5 text-slate-400">${escapeHtml(s.method || '')}</td>
-          <td class="p-2.5 font-bold text-emerald-400">$${(Number(s.total)||0).toFixed(2)}</td>
-          <td class="p-2.5 text-slate-400"><i class="fa-solid fa-chevron-right"></i></td>
-        </tr>`).join('');
+      if (tbody) {
+        if (!filteredSales.length) { tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-slate-500">Sin ventas en este periodo.</td></tr>'; return; }
+        tbody.innerHTML = [...filteredSales].sort((a,b) => (b.dateIso || '').localeCompare(a.dateIso || '') || Number(b.id)-Number(a.id)).map(s => `
+          <tr onclick="openSaleDetailModal('${String(s.id).replace(/'/g, '')}')" class="hover:bg-slate-700/50 cursor-pointer">
+            <td class="p-2.5 text-slate-300">${escapeHtml(s.dateFormatted || s.dateIso || '')}</td>
+            <td class="p-2.5 font-bold text-white">${escapeHtml(s.customer || 'Cliente Frecuente')}</td>
+            <td class="p-2.5 text-slate-400">${escapeHtml(s.method || '')}</td>
+            <td class="p-2.5 font-bold text-emerald-400">$${(Number(s.total)||0).toFixed(2)}</td>
+            <td class="p-2.5 text-slate-400"><i class="fa-solid fa-chevron-right"></i></td>
+          </tr>`).join('');
+      }
     }
 
     function refreshCustomerSuggestions(){
@@ -1015,6 +1048,7 @@
     function showCustomerHistory(id){
       const c=customers.find(x=>x.id===id); if(!c)return;
       const host=document.getElementById('customer-history'); const hist=sales.filter(s=>(s.customer||'').trim().toLocaleLowerCase('es-MX')===(c.name||'').trim().toLocaleLowerCase('es-MX')).sort((a,b)=>(b.dateIso||'').localeCompare(a.dateIso||''));
+      if (!host) return;
       host.classList.remove('hidden');
       host.innerHTML=`<div class="flex justify-between items-center"><h3 class="font-bold">Historial: ${escapeHtml(c.name)}</h3><button onclick="document.getElementById('customer-history').classList.add('hidden')" class="text-slate-400">Cerrar</button></div><p class="text-xs text-slate-400 my-1">Dirección: ${escapeHtml(c.address||'—')}</p><p class="text-xs text-slate-400 mb-2">Notas: ${escapeHtml(c.notes||'—')}</p>${hist.length?hist.map(s=>`<button onclick="switchTab('reports');openSaleDetailModal('${String(s.id).replace(/'/g,'')}')" class="w-full flex justify-between text-left border-t border-slate-700 py-2 text-xs"><span>${escapeHtml(s.dateFormatted||s.dateIso)} · ${(s.items\vert{}\vert{}[]).length} prod</span><b class="text-emerald-400">$${(Number(s.total)||0).toFixed(2)}</b></button>`).join(''):'<p class="text-xs text-slate-400 py-3">Aún sin compras.</p>'}`;
     }
