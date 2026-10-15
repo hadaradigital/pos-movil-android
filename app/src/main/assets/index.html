@@ -13,6 +13,10 @@
       font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
       user-select: none;
       -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    button {
+      -webkit-tap-highlight-color: transparent;
     }
     .ticket-paper {
       background-color: #ffffff;
@@ -121,7 +125,7 @@
       </div>
     </section>
 
-    <!-- SECTION 2: INVENTARIO / PRODUCTOS (Sin Stock ni Costo) -->
+    <!-- SECTION 2: INVENTARIO / PRODUCTOS -->
     <section id="tab-inventory" class="h-full hidden flex-col p-3 space-y-3 overflow-y-auto">
       <div class="flex justify-between items-center shrink-0">
         <div class="flex items-center space-x-2">
@@ -151,7 +155,7 @@
       </div>
     </section>
 
-    <!-- SECTION 3: REPORTES / LIBRO DE VENTAS (Optimizado y con Scroll Corregido) -->
+    <!-- SECTION 3: REPORTES / LIBRO DE VENTAS -->
     <section id="tab-reports" class="h-full hidden flex-col p-3 space-y-3 overflow-y-auto">
       <div class="flex flex-col gap-2 shrink-0">
         <div class="grid grid-cols-2 gap-2">
@@ -189,7 +193,7 @@
       </div>
     </section>
 
-    <!-- SECTION 4: CLIENTES (Sin Contacto ni Teléfono) -->
+    <!-- SECTION 4: CLIENTES -->
     <section id="tab-customers" class="h-full hidden flex-col p-3 space-y-3 overflow-y-auto mb-4">
       <div class="bg-slate-800 border border-slate-700 rounded-xl p-3 space-y-2">
         <input type="hidden" id="client-id">
@@ -205,26 +209,27 @@
 
   </main>
 
-  <!-- NAVIGATION BAR (4 Secciones principales) -->
+  <!-- NAVIGATION BAR CON POINTER-EVENTS FIX PARA ANDROID -->
   <nav class="bg-slate-800 border-t border-slate-700 px-2 py-1.5 flex justify-around items-center text-xs shrink-0">
     <button onclick="switchTab('sales')" id="nav-sales" class="flex flex-col items-center p-1.5 text-indigo-400 font-bold">
-      <i class="fa-solid fa-store text-base mb-0.5"></i>
-      <span>Ventas</span>
+      <i class="fa-solid fa-store text-base mb-0.5 pointer-events-none"></i>
+      <span class="pointer-events-none">Ventas</span>
     </button>
     <button onclick="switchTab('inventory')" id="nav-inventory" class="flex flex-col items-center p-1.5 text-slate-400">
-      <i class="fa-solid fa-boxes-stacked text-base mb-0.5"></i>
-      <span>Productos</span>
+      <i class="fa-solid fa-boxes-stacked text-base mb-0.5 pointer-events-none"></i>
+      <span class="pointer-events-none">Productos</span>
     </button>
     <button onclick="switchTab('reports')" id="nav-reports" class="flex flex-col items-center p-1.5 text-slate-400">
-      <i class="fa-solid fa-chart-line text-base mb-0.5"></i>
-      <span>Reportes</span>
+      <i class="fa-solid fa-chart-line text-base mb-0.5 pointer-events-none"></i>
+      <span class="pointer-events-none">Reportes</span>
     </button>
     <button onclick="switchTab('customers')" id="nav-customers" class="flex flex-col items-center p-1.5 text-slate-400">
-      <i class="fa-solid fa-users text-base mb-0.5"></i><span>Clientes</span>
+      <i class="fa-solid fa-users text-base mb-0.5 pointer-events-none"></i>
+      <span class="pointer-events-none">Clientes</span>
     </button>
   </nav>
 
-  <!-- MODAL: CONFIGURACIÓN Y TICKET (Movido a menú emergente) -->
+  <!-- MODAL: CONFIGURACIÓN Y TICKET -->
   <div id="modal-ticket-config" class="fixed inset-0 bg-black/75 hidden justify-center items-center p-3 z-50">
     <div class="bg-slate-800 border border-slate-700 w-full max-w-md rounded-2xl p-4 space-y-3 shadow-2xl max-h-[90vh] overflow-y-auto">
       <div class="flex justify-between items-center border-b border-slate-700 pb-2">
@@ -316,7 +321,7 @@
     </div>
   </div>
 
-  <!-- MODAL: AGREGAR / EDITAR PRODUCTO (Sin Stock ni Costo) -->
+  <!-- MODAL: AGREGAR / EDITAR PRODUCTO -->
   <div id="modal-product" class="fixed inset-0 bg-black/75 hidden justify-center items-center p-3 z-50">
     <div class="bg-slate-800 border border-slate-700 w-full max-w-sm rounded-2xl p-4 space-y-3 shadow-2xl">
       <div class="flex justify-between items-center border-b border-slate-700 pb-2">
@@ -484,7 +489,6 @@
       if (existing) {
         existing.qty = parseFloat((existing.qty + 1).toFixed(3));
       } else {
-        // Usa el último precio guardado de la última venta o el precio base
         const currentPrice = prod.lastPrice !== undefined ? prod.lastPrice : prod.price;
         cart.push({
           id: prod.id,
@@ -624,7 +628,6 @@
       const total = cart.reduce((sum, item) => sum + (item.qty * item.price), 0);
       const customer = document.getElementById('cart-customer-name').value.trim() || 'Cliente Frecuente';
 
-      // Guarda el precio de esta venta en cada producto para recordarlo la próxima vez
       cart.forEach(item => {
         const prod = products.find(p => p.id === item.id);
         if (prod) {
@@ -963,7 +966,7 @@
 
       const tbody = document.getElementById('reports-table-body');
       if (!filteredSales.length) { tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-slate-500">Sin ventas en este periodo.</td></tr>'; return; }
-      tbody.innerHTML = [...filteredSales].sort((a,b) => (b.dateIso || '').localeCompare(a.dateIso || '') || Number(b.id)-Number(a.id)).map(s => `
+      tbody.innerHTML = [...filteredSales].sort((a,b) => (b.dateIso || '').localeCompare(a.dateIso || '') || Number(b.id)-Number(b.id)).map(s => `
         <tr onclick="openSaleDetailModal('${String(s.id).replace(/'/g, '')}')" class="hover:bg-slate-700/50 cursor-pointer">
           <td class="p-2.5 text-slate-300">${escapeHtml(s.dateFormatted || s.dateIso || '')}</td>
           <td class="p-2.5 font-bold text-white">${escapeHtml(s.customer || 'Cliente Frecuente')}</td>
