@@ -42,21 +42,22 @@
 </head>
 <body class="h-screen flex flex-col justify-between overflow-hidden">
 
-  <header class="bg-slate-800 border-b border-slate-700 px-4 py-3 flex justify-between items-center shadow-lg shrink-0">
+  <!-- HEADER SLIM -->
+  <header class="bg-slate-800 border-b border-slate-700 px-4 py-2 flex justify-between items-center shadow-lg shrink-0">
     <div class="flex items-center space-x-2">
-      <div class="bg-indigo-600 p-2 rounded-lg text-white">
-        <i class="fa-solid fa-cash-register text-lg"></i>
+      <div class="bg-indigo-600 p-1.5 rounded-lg text-white">
+        <i class="fa-solid fa-cash-register text-sm"></i>
       </div>
-      <div>
-        <h1 class="font-bold text-base leading-tight">POS Android</h1>
-        <p class="text-xs text-slate-400" id="header-business-name">Mi Negocio</p>
-      </div>
+      <span class="font-bold text-xs text-slate-200" id="header-business-name">Mi Negocio</span>
     </div>
-    <div class="flex items-center space-x-3">
-      <div id="bt-status" class="flex items-center space-x-1 bg-slate-700 px-2.5 py-1 rounded-full text-xs text-slate-400">
+    <div class="flex items-center space-x-2">
+      <div id="bt-status" class="flex items-center space-x-1 bg-slate-700 px-2 py-1 rounded-full text-[10px] text-slate-400">
         <i class="fa-solid fa-bluetooth text-indigo-400"></i>
-        <span class="hidden sm:inline">Listo</span>
+        <span>BT</span>
       </div>
+      <button onclick="openTicketConfigModal()" class="bg-slate-700 hover:bg-slate-600 text-slate-300 px-2.5 py-1.5 rounded-lg text-xs transition" title="Configuración y Ticket">
+        <i class="fa-solid fa-gear"></i>
+      </button>
     </div>
   </header>
 
@@ -67,8 +68,8 @@
       <!-- Search & Category Filters -->
       <div class="space-y-2 shrink-0">
         <div class="relative">
-          <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400"></i>
-          <input type="text" id="search-product" placeholder="Buscar producto..." class="w-full bg-slate-800 border border-slate-700 rounded-xl pl-9 pr-4 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
+          <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400 text-xs"></i>
+          <input type="text" id="search-product" placeholder="Buscar producto..." class="w-full bg-slate-800 border border-slate-700 rounded-xl pl-9 pr-4 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
         </div>
         <div id="categories-bar" class="flex space-x-2 overflow-x-auto no-scrollbar py-1">
           <!-- Categorías generadas dinámicamente -->
@@ -77,7 +78,7 @@
 
       <!-- Main Sales Content: Grid + Cart Split -->
       <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-3 overflow-hidden">
-        <!-- Products Grid -->
+        <!-- Products Grid (Minimalist Cards) -->
         <div class="overflow-y-auto no-scrollbar pr-1">
           <div id="products-grid" class="grid grid-cols-2 gap-2">
             <!-- Cards de productos -->
@@ -87,16 +88,16 @@
         <!-- Cart View -->
         <div class="bg-slate-800 rounded-xl border border-slate-700 flex flex-col overflow-hidden shadow-xl">
           <div class="bg-slate-750 px-3 py-2 border-b border-slate-700 flex justify-between items-center shrink-0">
-            <span class="font-bold text-sm text-slate-200"><i class="fa-solid fa-cart-shopping mr-1"></i> Carrito</span>
+            <span class="font-bold text-xs text-slate-200"><i class="fa-solid fa-cart-shopping mr-1"></i> Carrito</span>
             <button onclick="clearCart()" class="text-xs text-rose-400 hover:text-rose-300 font-medium">Vaciar</button>
           </div>
 
-          <!-- Customer Input -->
+          <!-- Customer Input (Sin Teléfono) -->
           <div class="p-2 border-b border-slate-700 bg-slate-800/50 shrink-0">
             <div class="relative">
               <i class="fa-solid fa-user absolute left-3 top-2.5 text-slate-400 text-xs"></i>
-              <input type="text" id="cart-customer-name" list="customer-suggestions" oninput="fillCustomerPhone()" placeholder="Nombre o negocio del cliente" class="w-full bg-slate-900 border border-slate-700 rounded-lg pl-8 pr-3 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500"><datalist id="customer-suggestions"></datalist>
-              <input type="tel" id="cart-customer-phone" placeholder="Teléfono / WhatsApp (opcional)" class="mt-1 w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+              <input type="text" id="cart-customer-name" list="customer-suggestions" placeholder="Nombre o negocio del cliente" class="w-full bg-slate-900 border border-slate-700 rounded-lg pl-8 pr-3 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+              <datalist id="customer-suggestions"></datalist>
             </div>
           </div>
 
@@ -111,7 +112,7 @@
               <span class="text-xs text-slate-400">Total a Cobrar</span>
               <span id="cart-total" class="text-xl font-extrabold text-emerald-400">$0.00</span>
             </div>
-            <button onclick="openCheckoutModal()" class="w-full bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-bold py-2.5 rounded-xl shadow-lg transition flex justify-center items-center space-x-2 text-sm">
+            <button onclick="openCheckoutModal()" class="w-full bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-bold py-2.5 rounded-xl shadow-lg transition flex justify-center items-center space-x-2 text-xs">
               <i class="fa-solid fa-money-bill-wave"></i>
               <span>Cobrar Venta</span>
             </button>
@@ -120,14 +121,15 @@
       </div>
     </section>
 
-    <!-- SECTION 2: INVENTARIO -->
+    <!-- SECTION 2: INVENTARIO / PRODUCTOS (Sin Stock ni Costo) -->
     <section id="tab-inventory" class="h-full hidden flex-col p-3 space-y-3 overflow-y-auto">
       <div class="flex justify-between items-center shrink-0">
-        <h2 class="text-lg font-bold">Catálogo de productos</h2><p class="text-xs text-slate-400">Aquí solo administras los productos y precios; las existencias no se controlan.</p>
-        <button onclick="openProductModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-3 py-2 rounded-lg flex items-center space-x-1 shadow">
-          <i class="fa-solid fa-plus"></i>
-          <span>Nuevo Producto</span>
-        </button>
+        <div class="flex items-center space-x-2">
+          <button onclick="openProductModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-3 py-2 rounded-lg flex items-center space-x-1 shadow">
+            <i class="fa-solid fa-plus"></i>
+            <span>Nuevo Producto</span>
+          </button>
+        </div>
       </div>
 
       <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden shadow-md">
@@ -137,8 +139,6 @@
               <tr>
                 <th class="p-3">Producto</th>
                 <th class="p-3">Categoría</th>
-                <th class="p-3">Stock</th>
-                <th class="p-3">Costo</th>
                 <th class="p-3">Precio</th>
                 <th class="p-3">Acciones</th>
               </tr>
@@ -151,105 +151,61 @@
       </div>
     </section>
 
-    <!-- SECTION 3: LIBRO DE VENTAS -->
+    <!-- SECTION 3: REPORTES / LIBRO DE VENTAS (Optimizado y con Scroll Corregido) -->
     <section id="tab-reports" class="h-full hidden flex-col p-3 space-y-3 overflow-y-auto">
       <div class="flex flex-col gap-2 shrink-0">
-        <h2 class="text-lg font-bold">Libro de ventas</h2>
-        <p class="text-[11px] text-slate-400">Consulta ventas, clientes y productos vendidos por día o periodo. No requiere llevar existencias.</p>
         <div class="grid grid-cols-2 gap-2">
-          <div><label class="block text-xs text-slate-400 mb-1">Desde</label><input type="date" id="report-date-from" onchange="renderReports()" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-2 py-2 text-xs text-white"></div>
-          <div><label class="block text-xs text-slate-400 mb-1">Hasta</label><input type="date" id="report-date-to" onchange="renderReports()" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-2 py-2 text-xs text-white"></div>
+          <div><label class="block text-[10px] text-slate-400 mb-1">Desde</label><input type="date" id="report-date-from" onchange="renderReports()" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white"></div>
+          <div><label class="block text-[10px] text-slate-400 mb-1">Hasta</label><input type="date" id="report-date-to" onchange="renderReports()" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white"></div>
         </div>
-        <input type="search" id="report-search" oninput="renderReports()" placeholder="Buscar cliente, teléfono o producto..." class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white">
+        <input type="search" id="report-search" oninput="renderReports()" placeholder="Buscar cliente o producto..." class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white">
         <div class="flex gap-2">
-          <button onclick="setReportPeriod('today')" class="flex-1 bg-slate-700 rounded-lg py-2 text-xs">Hoy</button>
-          <button onclick="setReportPeriod('week')" class="flex-1 bg-slate-700 rounded-lg py-2 text-xs">7 días</button>
-          <button onclick="setReportPeriod('month')" class="flex-1 bg-slate-700 rounded-lg py-2 text-xs">Este mes</button>
-          <button onclick="setReportPeriod('all')" class="flex-1 bg-slate-700 rounded-lg py-2 text-xs">Todo</button>
+          <button onclick="setReportPeriod('today')" class="flex-1 bg-slate-700 rounded-lg py-1.5 text-xs">Hoy</button>
+          <button onclick="setReportPeriod('week')" class="flex-1 bg-slate-700 rounded-lg py-1.5 text-xs">7 días</button>
+          <button onclick="setReportPeriod('month')" class="flex-1 bg-slate-700 rounded-lg py-1.5 text-xs">Mes</button>
+          <button onclick="setReportPeriod('all')" class="flex-1 bg-slate-700 rounded-lg py-1.5 text-xs">Todo</button>
         </div>
       </div>
+
+      <!-- Tarjetas reducidas -->
       <div class="grid grid-cols-2 gap-2 shrink-0">
-        <div class="bg-slate-800 p-3 rounded-xl border border-slate-700"><p class="text-xs text-slate-400">Venta del periodo</p><p id="report-total-sales" class="text-lg font-bold text-emerald-400">$0.00</p></div>
-        <div class="bg-slate-800 p-3 rounded-xl border border-slate-700"><p class="text-xs text-slate-400">Número de ventas</p><p id="report-sale-count" class="text-lg font-bold text-white">0</p></div>
-        <div class="bg-slate-800 p-3 rounded-xl border border-slate-700"><p class="text-xs text-slate-400">Utilidad estimada</p><p id="report-total-profit" class="text-lg font-bold text-indigo-400">$0.00</p></div>
-        <div class="bg-slate-800 p-3 rounded-xl border border-slate-700"><p class="text-xs text-slate-400">Clientes distintos</p><p id="report-customer-count" class="text-lg font-bold text-amber-300">0</p></div>
+        <div class="bg-slate-800 p-2.5 rounded-xl border border-slate-700"><p class="text-[10px] text-slate-400">Venta del periodo</p><p id="report-total-sales" class="text-base font-bold text-emerald-400">$0.00</p></div>
+        <div class="bg-slate-800 p-2.5 rounded-xl border border-slate-700"><p class="text-[10px] text-slate-400">Número de ventas</p><p id="report-sale-count" class="text-base font-bold text-white">0</p></div>
       </div>
-      <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden">
-        <div class="p-3 bg-slate-900 border-b border-slate-700 font-bold text-xs">Productos más vendidos</div>
+
+      <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden shrink-0">
+        <div class="p-2.5 bg-slate-900 border-b border-slate-700 font-bold text-xs">Productos más vendidos</div>
         <div class="overflow-x-auto"><table class="w-full text-left text-xs"><thead class="text-slate-400"><tr><th class="p-2">Producto</th><th class="p-2">Cantidad</th><th class="p-2">Importe</th></tr></thead><tbody id="report-products-body" class="divide-y divide-slate-700"></tbody></table></div>
       </div>
-      <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden">
-        <div class="p-3 bg-slate-900 border-b border-slate-700 font-bold text-xs">Clientes que compraron</div>
+
+      <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden shrink-0">
+        <div class="p-2.5 bg-slate-900 border-b border-slate-700 font-bold text-xs">Clientes que compraron</div>
         <div class="overflow-x-auto"><table class="w-full text-left text-xs"><thead class="text-slate-400"><tr><th class="p-2">Cliente</th><th class="p-2">Teléfono</th><th class="p-2">Compras</th><th class="p-2">Total</th></tr></thead><tbody id="report-customers-body" class="divide-y divide-slate-700"></tbody></table></div>
       </div>
-      <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden shadow-md">
-        <div class="p-3 bg-slate-900 border-b border-slate-700 font-bold text-xs">Detalle de ventas (toca una venta para ver sus productos)</div>
+
+      <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden shadow-md shrink-0 mb-4">
+        <div class="p-2.5 bg-slate-900 border-b border-slate-700 font-bold text-xs">Detalle de ventas (toca una venta)</div>
         <div class="overflow-x-auto"><table class="w-full text-left text-xs"><thead class="bg-slate-900/50 text-slate-400 border-b border-slate-700"><tr><th class="p-2.5">Fecha</th><th class="p-2.5">Cliente</th><th class="p-2.5">Método</th><th class="p-2.5">Total</th><th class="p-2.5">Detalle</th></tr></thead><tbody id="reports-table-body" class="divide-y divide-slate-700"></tbody></table></div>
       </div>
     </section>
 
-    <!-- SECTION CLIENTES -->
-    <section id="tab-customers" class="h-full hidden flex-col p-3 space-y-3 overflow-y-auto">
-      <div><h2 class="text-lg font-bold">Directorio de clientes</h2><p class="text-xs text-slate-400">Guarda los datos de cada negocio y consulta su historial de compras.</p></div>
+    <!-- SECTION 4: CLIENTES (Sin Contacto ni Teléfono) -->
+    <section id="tab-customers" class="h-full hidden flex-col p-3 space-y-3 overflow-y-auto mb-4">
       <div class="bg-slate-800 border border-slate-700 rounded-xl p-3 space-y-2">
         <input type="hidden" id="client-id">
         <label class="block text-xs text-slate-400">Nombre del negocio o cliente *</label><input id="client-name" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm" placeholder="Ej. Abarrotes Lupita">
-        <label class="block text-xs text-slate-400">Nombre del contacto</label><input id="client-contact" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm" placeholder="Persona que realiza pedidos">
-        <label class="block text-xs text-slate-400">Teléfono / WhatsApp</label><input id="client-phone" type="tel" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm" placeholder="618...">
         <label class="block text-xs text-slate-400">Dirección de entrega</label><input id="client-address" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm" placeholder="Calle, colonia, referencias">
         <label class="block text-xs text-slate-400">Notas</label><textarea id="client-notes" rows="2" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm" placeholder="Horario, preferencias, etc."></textarea>
         <div class="grid grid-cols-2 gap-2"><button onclick="saveCustomer()" class="bg-indigo-600 rounded-lg p-2 text-sm font-bold">Guardar cliente</button><button onclick="clearCustomerForm()" class="bg-slate-700 rounded-lg p-2 text-sm">Limpiar</button></div>
       </div>
-      <input id="customer-directory-search" oninput="renderCustomers()" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm" placeholder="Buscar cliente, teléfono o colonia...">
+      <input id="customer-directory-search" oninput="renderCustomers()" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm" placeholder="Buscar cliente o dirección...">
       <div id="customer-directory" class="space-y-2"></div>
       <div id="customer-history" class="hidden bg-slate-800 border border-slate-700 rounded-xl p-3"></div>
     </section>
 
-    <!-- SECTION 4: CONFIGURACIÓN DEL TICKET -->
-    <section id="tab-ticket-config" class="h-full hidden flex-col p-3 space-y-3 overflow-y-auto">
-      <h2 class="text-lg font-bold shrink-0">Personalización del Ticket</h2>
-      <div class="grid grid-cols-2 gap-2">
-        <button onclick="selectBluetoothPrinter()" class="bg-sky-600 hover:bg-sky-500 text-white font-bold py-2 rounded-lg text-xs">🖨️ Impresora Bluetooth</button>
-        <button onclick="backupData()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 rounded-lg text-xs">💾 Copia de seguridad</button>
-        <button onclick="restoreData()" class="bg-amber-600 hover:bg-amber-500 text-white font-bold py-2 rounded-lg text-xs">♻️ Restaurar copia</button>
-        <div id="printer-status" class="bg-slate-900 border border-slate-700 text-slate-300 rounded-lg p-2 text-[10px] flex items-center justify-center text-center">Sin impresora seleccionada</div>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <!-- Formulario de Configuración -->
-        <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-3">
-          <div>
-            <label class="block text-xs text-slate-400 mb-1">Nombre del Negocio</label>
-            <input type="text" id="cfg-business-name" oninput="updateTicketPreview()" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white">
-          </div>
-          <div>
-            <label class="block text-xs text-slate-400 mb-1">Ancho del Papel Térmico</label>
-            <select id="cfg-paper-width" onchange="updateTicketPreview()" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white">
-              <option value="58">58 mm (Impresora Portátil)</option>
-              <option value="80">80 mm (Escritorio)</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-xs text-slate-400 mb-1">Mensaje de Agradecimiento</label>
-            <input type="text" id="cfg-footer-msg" oninput="updateTicketPreview()" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white">
-          </div>
-          <button onclick="saveTicketConfig()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 rounded-lg text-xs transition shadow">
-            Guardar Configuración
-          </button>
-        </div>
-
-        <!-- Vista Previa Visual del Ticket -->
-        <div class="flex flex-col items-center">
-          <p class="text-xs text-slate-400 mb-2">Vista Previa del Formato</p>
-          <div id="ticket-preview-container" class="ticket-paper ticket-58 p-4 rounded shadow-2xl">
-            <!-- Formato renderizado dinámicamente -->
-          </div>
-        </div>
-      </div>
-    </section>
-
   </main>
 
+  <!-- NAVIGATION BAR (4 Secciones principales) -->
   <nav class="bg-slate-800 border-t border-slate-700 px-2 py-1.5 flex justify-around items-center text-xs shrink-0">
     <button onclick="switchTab('sales')" id="nav-sales" class="flex flex-col items-center p-1.5 text-indigo-400 font-bold">
       <i class="fa-solid fa-store text-base mb-0.5"></i>
@@ -266,11 +222,50 @@
     <button onclick="switchTab('customers')" id="nav-customers" class="flex flex-col items-center p-1.5 text-slate-400">
       <i class="fa-solid fa-users text-base mb-0.5"></i><span>Clientes</span>
     </button>
-    <button onclick="switchTab('ticket-config')" id="nav-ticket-config" class="flex flex-col items-center p-1.5 text-slate-400">
-      <i class="fa-solid fa-receipt text-base mb-0.5"></i>
-      <span>Ticket</span>
-    </button>
   </nav>
+
+  <!-- MODAL: CONFIGURACIÓN Y TICKET (Movido a menú emergente) -->
+  <div id="modal-ticket-config" class="fixed inset-0 bg-black/75 hidden justify-center items-center p-3 z-50">
+    <div class="bg-slate-800 border border-slate-700 w-full max-w-md rounded-2xl p-4 space-y-3 shadow-2xl max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center border-b border-slate-700 pb-2">
+        <h3 class="font-bold text-base">Configuración y Ticket</h3>
+        <button onclick="closeTicketConfigModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+
+      <div class="grid grid-cols-2 gap-2">
+        <button onclick="selectBluetoothPrinter()" class="bg-sky-600 hover:bg-sky-500 text-white font-bold py-2 rounded-lg text-xs">🖨️ Impresora BT</button>
+        <button onclick="backupData()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 rounded-lg text-xs">💾 Copia seguridad</button>
+        <button onclick="restoreData()" class="bg-amber-600 hover:bg-amber-500 text-white font-bold py-2 rounded-lg text-xs">♻️ Restaurar</button>
+        <div id="printer-status" class="bg-slate-900 border border-slate-700 text-slate-300 rounded-lg p-2 text-[10px] flex items-center justify-center text-center">Sin impresora</div>
+      </div>
+
+      <div class="space-y-3 pt-2 border-t border-slate-700">
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">Nombre del Negocio</label>
+          <input type="text" id="cfg-business-name" oninput="updateTicketPreview()" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white">
+        </div>
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">Ancho del Papel Térmico</label>
+          <select id="cfg-paper-width" onchange="updateTicketPreview()" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white">
+            <option value="58">58 mm (Portátil)</option>
+            <option value="80">80 mm (Escritorio)</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">Mensaje de Agradecimiento</label>
+          <input type="text" id="cfg-footer-msg" oninput="updateTicketPreview()" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white">
+        </div>
+        <button onclick="saveTicketConfig()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 rounded-lg text-xs transition shadow">
+          Guardar Configuración
+        </button>
+      </div>
+
+      <div class="flex flex-col items-center pt-2 border-t border-slate-700">
+        <p class="text-xs text-slate-400 mb-2">Vista Previa del Ticket</p>
+        <div id="ticket-preview-container" class="ticket-paper ticket-58 p-3 rounded shadow-xl"></div>
+      </div>
+    </div>
+  </div>
 
   <!-- MODAL: COBRAR VENTA -->
   <div id="modal-checkout" class="fixed inset-0 bg-black/75 hidden justify-center items-center p-3 z-50">
@@ -321,7 +316,7 @@
     </div>
   </div>
 
-  <!-- MODAL: AGREGAR / EDITAR PRODUCTO -->
+  <!-- MODAL: AGREGAR / EDITAR PRODUCTO (Sin Stock ni Costo) -->
   <div id="modal-product" class="fixed inset-0 bg-black/75 hidden justify-center items-center p-3 z-50">
     <div class="bg-slate-800 border border-slate-700 w-full max-w-sm rounded-2xl p-4 space-y-3 shadow-2xl">
       <div class="flex justify-between items-center border-b border-slate-700 pb-2">
@@ -349,27 +344,9 @@
             </select>
           </div>
         </div>
-        <div class="grid grid-cols-2 gap-2">
-          <div>
-            <label class="block text-slate-400 mb-1">Precio Costo ($)</label>
-            <input type="number" step="any" id="prod-cost" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white">
-          </div>
-          <div>
-            <label class="block text-slate-400 mb-1">Precio Venta Base ($)</label>
-            <input type="number" step="any" id="prod-price" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white">
-          </div>
-        </div>
-        <div class="grid grid-cols-2 gap-2">
-          <div>
-            <label class="block text-slate-400 mb-1">Stock Actual</label>
-            <input type="number" step="any" id="prod-stock" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white">
-          </div>
-          <div class="flex items-center pt-4">
-            <label class="flex items-center space-x-2 text-slate-300 cursor-pointer">
-              <input type="checkbox" id="prod-allow-no-stock" class="rounded bg-slate-900 border-slate-700 text-indigo-600">
-              <span>Vender sin stock</span>
-            </label>
-          </div>
+        <div>
+          <label class="block text-slate-400 mb-1">Precio de Venta ($)</label>
+          <input type="number" step="any" id="prod-price" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white">
         </div>
 
         <div class="pt-2">
@@ -401,9 +378,9 @@
   <!-- JAVASCRIPT LOGIC -->
   <script>
     let products = JSON.parse(localStorage.getItem('pos_products')) || [
-      { id: '1', name: 'Sandía', category: 'Frutas', unit: 'kg', cost: 8.00, price: 15.00, stock: 50, allowNoStock: true },
-      { id: '2', name: 'Naranja', category: 'Frutas', unit: 'kg', cost: 14.00, price: 28.00, stock: 35, allowNoStock: true },
-      { id: '3', name: 'Aguacate Hass', category: 'Verduras', unit: 'kg', cost: 45.00, price: 70.00, stock: 20, allowNoStock: false }
+      { id: '1', name: 'Sandía', category: 'Frutas', unit: 'kg', price: 15.00 },
+      { id: '2', name: 'Naranja', category: 'Frutas', unit: 'kg', price: 28.00 },
+      { id: '3', name: 'Aguacate Hass', category: 'Verduras', unit: 'kg', price: 70.00 }
     ];
 
     let sales = JSON.parse(localStorage.getItem('pos_sales')) || [];
@@ -436,22 +413,33 @@
     });
 
     function switchTab(tab) {
-      ['sales', 'inventory', 'reports', 'customers', 'ticket-config'].forEach(t => {
-        document.getElementById(`tab-${t}`).classList.add('hidden');
-        document.getElementById(`tab-${t}`).classList.remove('flex');
-        document.getElementById(`nav-${t}`).classList.remove('text-indigo-400', 'font-bold');
-        document.getElementById(`nav-${t}`).classList.add('text-slate-400');
+      ['sales', 'inventory', 'reports', 'customers'].forEach(t => {
+        const tabEl = document.getElementById(`tab-${t}`);
+        const navEl = document.getElementById(`nav-${t}`);
+        if(tabEl) { tabEl.classList.add('hidden'); tabEl.classList.remove('flex'); }
+        if(navEl) { navEl.classList.remove('text-indigo-400', 'font-bold'); navEl.classList.add('text-slate-400'); }
       });
 
-      document.getElementById(`tab-${tab}`).classList.remove('hidden');
-      document.getElementById(`tab-${tab}`).classList.add('flex');
-      document.getElementById(`nav-${tab}`).classList.add('text-indigo-400', 'font-bold');
-      document.getElementById(`nav-${tab}`).classList.remove('text-slate-400');
+      const activeTab = document.getElementById(`tab-${tab}`);
+      const activeNav = document.getElementById(`nav-${tab}`);
+      if(activeTab) { activeTab.classList.remove('hidden'); activeTab.classList.add('flex'); }
+      if(activeNav) { activeNav.classList.add('text-indigo-400', 'font-bold'); activeNav.classList.remove('text-slate-400'); }
 
       if (tab === 'reports') renderReports();
       if (tab === 'customers') renderCustomers();
       if (tab === 'inventory') renderInventory();
-      if (tab === 'ticket-config') updateTicketPreview();
+    }
+
+    function openTicketConfigModal() {
+      document.getElementById('modal-ticket-config').classList.remove('hidden');
+      document.getElementById('modal-ticket-config').classList.add('flex');
+      loadTicketConfigForm();
+      updateTicketPreview();
+    }
+
+    function closeTicketConfigModal() {
+      document.getElementById('modal-ticket-config').classList.add('hidden');
+      document.getElementById('modal-ticket-config').classList.remove('flex');
     }
 
     function renderCategoriesBar() {
@@ -480,15 +468,8 @@
 
       const grid = document.getElementById('products-grid');
       grid.innerHTML = filtered.map(p => `
-        <div onclick="addToCart('${p.id}')" class="bg-slate-800 border border-slate-700 p-2.5 rounded-xl flex flex-col justify-between cursor-pointer active:scale-95 transition shadow-sm">
-          <div>
-            <span class="text-[10px] text-indigo-400 font-bold uppercase tracking-wider">${p.category}</span>
-            <h4 class="font-bold text-xs text-white truncate">${p.name}</h4>
-          </div>
-          <div class="mt-2 flex justify-between items-end">
-            <span class="text-xs font-extrabold text-emerald-400">$${parseFloat(p.price).toFixed(2)} <span class="text-[9px] text-slate-400 font-normal">/${p.unit}</span></span>
-            <span class="text-[10px] ${p.stock <= 5 ? 'text-rose-400' : 'text-slate-400'}">Stk: ${p.stock}</span>
-          </div>
+        <div onclick="addToCart('${p.id}')" class="bg-slate-800 border border-slate-700 p-3 rounded-xl flex items-center justify-center cursor-pointer active:scale-95 transition shadow-sm text-center min-h-[55px]">
+          <h4 class="font-bold text-xs text-white">${escapeHtml(p.name)}</h4>
         </div>
       `).join('');
     }
@@ -503,12 +484,13 @@
       if (existing) {
         existing.qty = parseFloat((existing.qty + 1).toFixed(3));
       } else {
+        // Usa el último precio guardado de la última venta o el precio base
+        const currentPrice = prod.lastPrice !== undefined ? prod.lastPrice : prod.price;
         cart.push({
           id: prod.id,
           name: prod.name,
           unit: prod.unit,
-          cost: prod.cost,
-          price: prod.price,
+          price: currentPrice,
           qty: 1
         });
       }
@@ -554,7 +536,7 @@
       container.innerHTML = cart.map(item => `
         <div class="bg-slate-900/80 border border-slate-700/80 p-2 rounded-xl space-y-1.5">
           <div class="flex justify-between items-center">
-            <span class="font-bold text-xs text-white truncate max-w-[150px]">${item.name}</span>
+            <span class="font-bold text-xs text-white truncate max-w-[150px]">${escapeHtml(item.name)}</span>
             <button onclick="removeFromCart('${item.id}')" class="text-slate-500 hover:text-rose-400 text-xs px-1"><i class="fa-solid fa-trash"></i></button>
           </div>
           <div class="grid grid-cols-2 gap-1.5 items-center">
@@ -640,35 +622,16 @@
 
     function processFinalSale() {
       const total = cart.reduce((sum, item) => sum + (item.qty * item.price), 0);
-      const totalCost = cart.reduce((sum, item) => sum + (item.qty * item.cost), 0);
-      const profit = total - totalCost;
       const customer = document.getElementById('cart-customer-name').value.trim() || 'Cliente Frecuente';
-      const customerPhone = document.getElementById('cart-customer-phone').value.trim();
 
-      /* Control de existencias desactivado: el catálogo se usa solo para seleccionar productos y precios. */
-      /* for (let item of cart) {
-        const prod = products.find(p => p.id === item.id);
-        if (prod && !prod.allowNoStock && prod.stock < item.qty) {
-          const msgModal = document.createElement('div');
-          msgModal.className = 'fixed inset-0 bg-black/70 flex justify-center items-center p-4 z-50';
-          msgModal.innerHTML = `
-            <div class="bg-slate-800 border border-slate-700 p-4 rounded-xl max-w-xs text-center space-y-3">
-              <p class="text-sm font-bold text-rose-400">El producto ${prod.name} no tiene suficiente stock (${prod.stock} disponibles).</p>
-              <button onclick="this.parentElement.parentElement.remove()" class="bg-slate-700 text-white font-bold px-4 py-1.5 rounded-lg text-xs">Entendido</button>
-            </div>
-          `;
-          document.body.appendChild(msgModal);
-          return;
-        }
-      }
-
+      // Guarda el precio de esta venta en cada producto para recordarlo la próxima vez
       cart.forEach(item => {
         const prod = products.find(p => p.id === item.id);
         if (prod) {
-          prod.stock = parseFloat((prod.stock - item.qty).toFixed(3));
+          prod.lastPrice = item.price;
         }
       });
-      saveProductsToStorage(); */
+      saveProductsToStorage();
 
       const now = new Date();
       const dateFormatted = now.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
@@ -678,22 +641,19 @@
         dateFormatted: dateFormatted,
         dateIso: `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`,
         customer: customer,
-        customerPhone: customerPhone,
         method: currentPaymentMethod,
         items: [...cart],
-        total: total,
-        profit: profit
+        total: total
       };
 
       sales.push(saleRecord);
       localStorage.setItem('pos_sales', JSON.stringify(sales));
-      if (customer !== 'Cliente Frecuente') upsertCustomerFromSale(customer, customerPhone);
+      if (customer !== 'Cliente Frecuente') upsertCustomerFromSale(customer);
 
       printTicket(saleRecord);
 
       cart = [];
       document.getElementById('cart-customer-name').value = '';
-      document.getElementById('cart-customer-phone').value = '';
       closeCheckoutModal();
       renderCart();
       renderProductsGrid();
@@ -716,7 +676,7 @@
 
       return `
         <div class="ticket-paper ${widthClass}" style="padding: 8px; margin: 0 auto; text-align: center;">
-          <div style="font-weight: font-black; font-size: 14px; text-transform: uppercase;">${ticketConfig.businessName}</div>
+          <div style="font-weight: bold; font-size: 14px; text-transform: uppercase;">${ticketConfig.businessName}</div>
           <div style="margin-top: 4px; font-size: 10px;">${sale.dateFormatted}</div>
           <div style="font-size: 11px; font-weight: bold; margin-bottom: 6px;">Cliente: ${sale.customer}</div>
           
@@ -726,7 +686,7 @@
           
           <div style="border-top: 1px dashed #000; margin: 6px 0;"></div>
           
-          <div style="display: flex; justify-content: space-between; font-size: 14px; font-weight: font-black; margin-top: 4px;">
+          <div style="display: flex; justify-content: space-between; font-size: 14px; font-weight: bold; margin-top: 4px;">
             <span>TOTAL:</span>
             <span>$${sale.total.toFixed(2)}</span>
           </div>
@@ -815,7 +775,7 @@
       };
 
       const mockSale = {
-        dateFormatted: '24 de sep. de 2026',
+        dateFormatted: '14 de oct. de 2026',
         customer: 'Juan Pérez',
         total: 430.00,
         items: [
@@ -847,7 +807,7 @@
           <div class="border-b border-dashed border-black my-1.5"></div>
           ${itemsRows}
           <div class="border-b border-dashed border-black my-1.5"></div>
-          <div class="flex justify-between font-black text-sm mt-1">
+          <div class="flex justify-between font-bold text-sm mt-1">
             <span>TOTAL:</span>
             <span>$${mockSale.total.toFixed(2)}</span>
           </div>
@@ -860,10 +820,8 @@
       const tbody = document.getElementById('inventory-table-body');
       tbody.innerHTML = products.map(p => `
         <tr>
-          <td class="p-3 font-bold text-white">${p.name}</td>
-          <td class="p-3 text-slate-400">${p.category}</td>
-          <td class="p-3 font-bold ${p.stock <= 5 ? 'text-rose-400' : 'text-slate-300'}">${p.stock} ${p.unit}</td>
-          <td class="p-3 text-slate-400">$${parseFloat(p.cost).toFixed(2)}</td>
+          <td class="p-3 font-bold text-white">${escapeHtml(p.name)}</td>
+          <td class="p-3 text-slate-400">${escapeHtml(p.category)}</td>
           <td class="p-3 font-bold text-emerald-400">$${parseFloat(p.price).toFixed(2)}</td>
           <td class="p-3 space-x-1">
             <button onclick="openProductModal('${p.id}')" class="text-indigo-400 hover:text-indigo-300 p-1"><i class="fa-solid fa-pen"></i></button>
@@ -884,10 +842,7 @@
         document.getElementById('prod-name').value = p.name;
         document.getElementById('prod-category').value = p.category;
         document.getElementById('prod-unit').value = p.unit;
-        document.getElementById('prod-cost').value = p.cost;
         document.getElementById('prod-price').value = p.price;
-        document.getElementById('prod-stock').value = p.stock;
-        document.getElementById('prod-allow-no-stock').checked = p.allowNoStock || false;
       } else {
         title.innerText = 'Nuevo Producto';
         document.getElementById('product-form').reset();
@@ -909,16 +864,13 @@
       const name = document.getElementById('prod-name').value.trim();
       const category = document.getElementById('prod-category').value.trim();
       const unit = document.getElementById('prod-unit').value;
-      const cost = parseFloat(document.getElementById('prod-cost').value) || 0;
       const price = parseFloat(document.getElementById('prod-price').value) || 0;
-      const stock = parseFloat(document.getElementById('prod-stock').value) || 0;
-      const allowNoStock = document.getElementById('prod-allow-no-stock').checked;
 
       if (id) {
         const prod = products.find(p => p.id === id);
-        if (prod) Object.assign(prod, { name, category, unit, cost, price, stock, allowNoStock });
+        if (prod) Object.assign(prod, { name, category, unit, price });
       } else {
-        products.push({ id: Date.now().toString(), name, category, unit, cost, price, stock, allowNoStock });
+        products.push({ id: Date.now().toString(), name, category, unit, price });
       }
 
       saveProductsToStorage();
@@ -933,7 +885,7 @@
       confirmModal.className = 'fixed inset-0 bg-black/70 flex justify-center items-center p-4 z-50';
       confirmModal.innerHTML = `
         <div class="bg-slate-800 border border-slate-700 p-4 rounded-xl max-w-xs text-center space-y-3">
-          <p class="text-sm font-bold text-white">¿Eliminar este producto del inventario?</p>
+          <p class="text-sm font-bold text-white">¿Eliminar este producto?</p>
           <div class="flex justify-center space-x-2">
             <button id="confirm-yes" class="bg-rose-600 text-white font-bold px-3 py-1.5 rounded-lg text-xs">Eliminar</button>
             <button id="confirm-no" class="bg-slate-700 text-slate-300 font-bold px-3 py-1.5 rounded-lg text-xs">Cancelar</button>
@@ -979,19 +931,18 @@
       const periodSales = sales.filter(s => (!from || s.dateIso >= from) && (!to || s.dateIso <= to));
       const filteredSales = periodSales.filter(s => {
         if (!query) return true;
-        const customerMatch = `${s.customer || ''} ${s.customerPhone || ''}`.toLocaleLowerCase('es-MX').includes(query);
+        const customerMatch = (s.customer || '').toLocaleLowerCase('es-MX').includes(query);
         const productMatch = (s.items || []).some(i => (i.name || '').toLocaleLowerCase('es-MX').includes(query));
         return customerMatch || productMatch;
       });
       const totalSales = filteredSales.reduce((sum, s) => sum + (Number(s.total) || 0), 0);
-      const totalProfit = filteredSales.reduce((sum, s) => sum + (Number(s.profit) || 0), 0);
       const customerMap = new Map();
       const productMap = new Map();
       filteredSales.forEach(s => {
         const cname = (s.customer || 'Cliente Frecuente').trim() || 'Cliente Frecuente';
-        const ckey = `${cname.toLocaleLowerCase('es-MX')}|${s.customerPhone || ''}`;
-        const c = customerMap.get(ckey) || { name: cname, phone: s.customerPhone || '—', count: 0, total: 0 };
-        c.count += 1; c.total += Number(s.total) || 0; if (s.customerPhone) c.phone = s.customerPhone;
+        const ckey = cname.toLocaleLowerCase('es-MX');
+        const c = customerMap.get(ckey) || { name: cname, phone: '—', count: 0, total: 0 };
+        c.count += 1; c.total += Number(s.total) || 0;
         customerMap.set(ckey, c);
         (s.items || []).forEach(i => {
           const key = (i.name || 'Producto').toLocaleLowerCase('es-MX');
@@ -1000,21 +951,22 @@
         });
       });
       document.getElementById('report-total-sales').innerText = `$${totalSales.toFixed(2)}`;
-      document.getElementById('report-total-profit').innerText = `$${totalProfit.toFixed(2)}`;
       document.getElementById('report-sale-count').innerText = filteredSales.length;
-      document.getElementById('report-customer-count').innerText = new Set(filteredSales.map(s => (s.customer || 'Cliente Frecuente').toLocaleLowerCase('es-MX'))).size;
+
       const productBody = document.getElementById('report-products-body');
       const bestProducts = [...productMap.values()].sort((a,b) => b.qty-a.qty);
-      productBody.innerHTML = bestProducts.length ? bestProducts.map(p => `<tr><td class="p-2 font-semibold">${escapeHtml(p.name)}</td><td class="p-2">${p.qty}</td><td class="p-2 text-emerald-400">$${p.total.toFixed(2)}</td></tr>`).join('') : '<tr><td colspan="3" class="p-3 text-center text-slate-500">Sin productos en este periodo.</td></tr>';
+      productBody.innerHTML = bestProducts.length ? bestProducts.map(p => `<tr><td class="p-2 font-semibold">${escapeHtml(p.name)}</td><td class="p-2">${p.qty}</td><td class="p-2 text-emerald-400">$${p.total.toFixed(2)}</td></tr>`).join('') : '<tr><td colspan="3" class="p-3 text-center text-slate-500">Sin productos.</td></tr>';
+
       const customerBody = document.getElementById('report-customers-body');
       const bestCustomers = [...customerMap.values()].sort((a,b) => b.total-a.total);
-      customerBody.innerHTML = bestCustomers.length ? bestCustomers.map(c => `<tr><td class="p-2 font-semibold">${escapeHtml(c.name)}</td><td class="p-2">${escapeHtml(c.phone)}</td><td class="p-2">${c.count}</td><td class="p-2 text-emerald-400">$${c.total.toFixed(2)}</td></tr>`).join('') : '<tr><td colspan="4" class="p-3 text-center text-slate-500">Sin clientes en este periodo.</td></tr>';
+      customerBody.innerHTML = bestCustomers.length ? bestCustomers.map(c => `<tr><td class="p-2 font-semibold">${escapeHtml(c.name)}</td><td class="p-2">${escapeHtml(c.phone)}</td><td class="p-2">${c.count}</td><td class="p-2 text-emerald-400">$${c.total.toFixed(2)}</td></tr>`).join('') : '<tr><td colspan="4" class="p-3 text-center text-slate-500">Sin clientes.</td></tr>';
+
       const tbody = document.getElementById('reports-table-body');
       if (!filteredSales.length) { tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-slate-500">Sin ventas en este periodo.</td></tr>'; return; }
       tbody.innerHTML = [...filteredSales].sort((a,b) => (b.dateIso || '').localeCompare(a.dateIso || '') || Number(b.id)-Number(a.id)).map(s => `
         <tr onclick="openSaleDetailModal('${String(s.id).replace(/'/g, '')}')" class="hover:bg-slate-700/50 cursor-pointer">
           <td class="p-2.5 text-slate-300">${escapeHtml(s.dateFormatted || s.dateIso || '')}</td>
-          <td class="p-2.5 font-bold text-white">${escapeHtml(s.customer || 'Cliente Frecuente')}${s.customerPhone ? `<div class="text-[10px] text-slate-400">${escapeHtml(s.customerPhone)}</div>` : ''}</td>
+          <td class="p-2.5 font-bold text-white">${escapeHtml(s.customer || 'Cliente Frecuente')}</td>
           <td class="p-2.5 text-slate-400">${escapeHtml(s.method || '')}</td>
           <td class="p-2.5 font-bold text-emerald-400">$${(Number(s.total)||0).toFixed(2)}</td>
           <td class="p-2.5 text-slate-400"><i class="fa-solid fa-chevron-right"></i></td>
@@ -1025,49 +977,43 @@
       const dl=document.getElementById('customer-suggestions'); if(!dl)return;
       dl.innerHTML=customers.map(c=>`<option value="${escapeHtml(c.name)}"></option>`).join('');
     }
-    function fillCustomerPhone(){
-      const name=(document.getElementById('cart-customer-name').value||'').trim().toLocaleLowerCase('es-MX');
-      const c=customers.find(x=>(x.name||'').trim().toLocaleLowerCase('es-MX')===name);
-      if(c && c.phone) document.getElementById('cart-customer-phone').value=c.phone;
-    }
-    function upsertCustomerFromSale(name, phone){
+    function upsertCustomerFromSale(name){
       const key=name.trim().toLocaleLowerCase('es-MX');
       let c=customers.find(x=>(x.name||'').trim().toLocaleLowerCase('es-MX')===key);
-      if(!c){ c={id:String(Date.now()),name:name.trim(),contact:'',phone:phone||'',address:'',notes:'',createdAt:new Date().toISOString()}; customers.push(c); }
-      else if(phone) c.phone=phone;
-      c.lastPurchase=new Date().toISOString(); c.purchaseCount=(c.purchaseCount||0)+1;
+      if(!c){ c={id:String(Date.now()),name:name.trim(),address:'',notes:'',createdAt:new Date().toISOString()}; customers.push(c); }
+      c.purchaseCount=(c.purchaseCount||0)+1;
       saveCustomersToStorage(); refreshCustomerSuggestions(); renderCustomers();
     }
-    function clearCustomerForm(){ ['client-id','client-name','client-contact','client-phone','client-address','client-notes'].forEach(id=>document.getElementById(id).value=''); }
+    function clearCustomerForm(){ ['client-id','client-name','client-address','client-notes'].forEach(id=>document.getElementById(id).value=''); }
     function saveCustomer(){
       const name=document.getElementById('client-name').value.trim(); if(!name){alert('Escribe el nombre del cliente o negocio.');return;}
       const id=document.getElementById('client-id').value;
       let c=id?customers.find(x=>x.id===id):null;
       if(!c){ c=customers.find(x=>(x.name||'').trim().toLocaleLowerCase('es-MX')===name.toLocaleLowerCase('es-MX')); }
       if(!c){c={id:String(Date.now()),createdAt:new Date().toISOString()};customers.push(c);}
-      Object.assign(c,{name,contact:document.getElementById('client-contact').value.trim(),phone:document.getElementById('client-phone').value.trim(),address:document.getElementById('client-address').value.trim(),notes:document.getElementById('client-notes').value.trim()});
+      Object.assign(c,{name,address:document.getElementById('client-address').value.trim(),notes:document.getElementById('client-notes').value.trim()});
       saveCustomersToStorage(); clearCustomerForm(); renderCustomers(); refreshCustomerSuggestions(); alert('Cliente guardado.');
     }
     function editCustomer(id){
       const c=customers.find(x=>x.id===id); if(!c)return;
-      document.getElementById('client-id').value=c.id; document.getElementById('client-name').value=c.name||''; document.getElementById('client-contact').value=c.contact||''; document.getElementById('client-phone').value=c.phone||''; document.getElementById('client-address').value=c.address||''; document.getElementById('client-notes').value=c.notes||'';
+      document.getElementById('client-id').value=c.id; document.getElementById('client-name').value=c.name||''; document.getElementById('client-address').value=c.address||''; document.getElementById('client-notes').value=c.notes||'';
       document.getElementById('tab-customers').scrollTo({top:0,behavior:'smooth'});
     }
     function renderCustomers(){
       const host=document.getElementById('customer-directory'); if(!host)return;
       const q=(document.getElementById('customer-directory-search')?.value||'').trim().toLocaleLowerCase('es-MX');
-      const list=customers.filter(c=>`${c.name||''} ${c.contact||''} ${c.phone||''} ${c.address||''}`.toLocaleLowerCase('es-MX').includes(q));
+      const list=customers.filter(c=>`${c.name||''} ${c.address||''}`.toLocaleLowerCase('es-MX').includes(q));
       host.innerHTML=list.length?list.map(c=>{
         const history=sales.filter(s=>(s.customer||'').trim().toLocaleLowerCase('es-MX')===(c.name||'').trim().toLocaleLowerCase('es-MX'));
         const total=history.reduce((a,s)=>a+(Number(s.total)||0),0);
-        return `<div class="bg-slate-800 border border-slate-700 rounded-xl p-3"><div class="flex justify-between gap-2"><div class="min-w-0"><p class="font-bold text-sm">${escapeHtml(c.name)}</p><p class="text-xs text-slate-400">${escapeHtml(c.contact||'')}</p><p class="text-xs text-slate-400">${escapeHtml(c.phone||'Sin teléfono')}</p><p class="text-xs text-slate-400">${escapeHtml(c.address||'Sin dirección')}</p></div><button onclick="editCustomer('${c.id}')" class="text-indigo-300 text-xs self-start">Editar</button></div><div class="flex justify-between mt-2 pt-2 border-t border-slate-700 text-xs"><span>${history.length} compras registradas</span><span class="text-emerald-400 font-bold">$${total.toFixed(2)}</span></div><button onclick="showCustomerHistory('${c.id}')" class="mt-2 w-full bg-slate-700 rounded-lg py-2 text-xs">Ver historial de compras</button></div>`;
-      }).join(''):'<p class="text-center text-xs text-slate-400 p-4">No hay clientes registrados con esa búsqueda.</p>';
+        return `<div class="bg-slate-800 border border-slate-700 rounded-xl p-3"><div class="flex justify-between gap-2"><div class="min-w-0"><p class="font-bold text-sm">${escapeHtml(c.name)}</p><p class="text-xs text-slate-400">${escapeHtml(c.address||'Sin dirección')}</p></div><button onclick="editCustomer('${c.id}')" class="text-indigo-300 text-xs self-start">Editar</button></div><div class="flex justify-between mt-2 pt-2 border-t border-slate-700 text-xs"><span>${history.length} compras</span><span class="text-emerald-400 font-bold">$${total.toFixed(2)}</span></div><button onclick="showCustomerHistory('${c.id}')" class="mt-2 w-full bg-slate-700 rounded-lg py-1.5 text-xs">Ver historial</button></div>`;
+      }).join(''):'<p class="text-center text-xs text-slate-400 p-4">No hay clientes registrados.</p>';
     }
     function showCustomerHistory(id){
       const c=customers.find(x=>x.id===id); if(!c)return;
       const host=document.getElementById('customer-history'); const hist=sales.filter(s=>(s.customer||'').trim().toLocaleLowerCase('es-MX')===(c.name||'').trim().toLocaleLowerCase('es-MX')).sort((a,b)=>(b.dateIso||'').localeCompare(a.dateIso||''));
       host.classList.remove('hidden');
-      host.innerHTML=`<div class="flex justify-between items-center"><h3 class="font-bold">Historial: ${escapeHtml(c.name)}</h3><button onclick="document.getElementById('customer-history').classList.add('hidden')" class="text-slate-400">Cerrar</button></div><p class="text-xs text-slate-400 mt-1">Contacto: ${escapeHtml(c.contact||'—')} · ${escapeHtml(c.phone||'Sin teléfono')}</p><p class="text-xs text-slate-400">Dirección: ${escapeHtml(c.address||'—')}</p><p class="text-xs text-slate-400 mb-2">Notas: ${escapeHtml(c.notes||'—')}</p>${hist.length?hist.map(s=>`<button onclick="switchTab('reports');openSaleDetailModal('${String(s.id).replace(/'/g,'')}')" class="w-full flex justify-between text-left border-t border-slate-700 py-2 text-xs"><span>${escapeHtml(s.dateFormatted||s.dateIso)} · ${(s.items||[]).length} productos</span><b class="text-emerald-400">$${(Number(s.total)||0).toFixed(2)}</b></button>`).join(''):'<p class="text-xs text-slate-400 py-3">Aún no tiene compras registradas.</p>'}`;
+      host.innerHTML=`<div class="flex justify-between items-center"><h3 class="font-bold">Historial: ${escapeHtml(c.name)}</h3><button onclick="document.getElementById('customer-history').classList.add('hidden')" class="text-slate-400">Cerrar</button></div><p class="text-xs text-slate-400 my-1">Dirección: ${escapeHtml(c.address||'—')}</p><p class="text-xs text-slate-400 mb-2">Notas: ${escapeHtml(c.notes||'—')}</p>${hist.length?hist.map(s=>`<button onclick="switchTab('reports');openSaleDetailModal('${String(s.id).replace(/'/g,'')}')" class="w-full flex justify-between text-left border-t border-slate-700 py-2 text-xs"><span>${escapeHtml(s.dateFormatted||s.dateIso)} · ${(s.items\vert{}\vert{}[]).length} prod</span><b class="text-emerald-400">$${(Number(s.total)||0).toFixed(2)}</b></button>`).join(''):'<p class="text-xs text-slate-400 py-3">Aún sin compras.</p>'}`;
     }
 
     function escapeHtml(value) {
@@ -1083,7 +1029,6 @@
         <div class="bg-slate-900 p-2.5 rounded-lg border border-slate-700 space-y-1">
           <div class="flex justify-between"><span class="text-slate-400">Fecha:</span><span class="text-white">${sale.dateFormatted}</span></div>
           <div class="flex justify-between"><span class="text-slate-400">Cliente:</span><span class="text-white font-bold">${escapeHtml(sale.customer || 'Cliente Frecuente')}</span></div>
-          <div class="flex justify-between"><span class="text-slate-400">Teléfono:</span><span class="text-white">${escapeHtml(sale.customerPhone || 'No registrado')}</span></div>
           <div class="flex justify-between"><span class="text-slate-400">Método Pago:</span><span class="text-white">${sale.method}</span></div>
         </div>
 
@@ -1094,9 +1039,7 @@
               <div class="py-1 flex justify-between items-center">
                 <div>
                   <p class="font-bold text-white">${escapeHtml(i.name)}</p>
-                  <p class="text-[10px] text-slate-400">${i.qty} ${i.unit} x $${i.price.toFixed(2)}</p>
-                </div>
-                <span class="font-bold text-emerald-400">$${(i.qty * i.price).toFixed(2)}</span>
+                  <p class="text-[10px] text-slate-400">${i.qty}${i.unit} x $${i.price.toFixed(2)}</p> </div> <span class="font-bold text-emerald-400">$${(i.qty * i.price).toFixed(2)}</span>
               </div>
             `).join('')}
           </div>
@@ -1117,36 +1060,6 @@
       document.getElementById('modal-sale-detail').classList.remove('flex');
     }
   </script>
-  <script>
-        // 1. Configuración de Base de Datos (IndexedDB)
-        let db;
-        const request = indexedDB.open("POS_Database", 1);
-
-        request.onupgradeneeded = function(event) {
-            db = event.target.result;
-            // Tabla de inventario e historial que durará años
-            if (!db.objectStoreNames.contains("inventario")) {
-                db.createObjectStore("inventario", { keyPath: "id", autoIncrement: true });
-            }
-        };
-
-        request.onsuccess = function(event) {
-            db = event.target.result;
-            console.log("Base de datos offline lista.");
-        };
-
-        // 2. Función para mandar a imprimir vía Bluetooth nativo
-        function cobrar() {
-            const ticket = "Mi Negocio\n1 Kg Cebolla... $20.00\nTotal: $20.00\nGracias por su compra!";
-            
-            // Llama a la función 'imprimirTicket' que creamos en MainActivity.java
-            if(window.AndroidPOS) {
-                window.AndroidPOS.imprimirTicket(ticket);
-            } else {
-                console.log("Solo funciona en la app nativa de Android");
-            }
-        }
-    </script>
 <script>window.addEventListener("load", loadSavedPrinterFromAndroid);</script>
 </body>
 </html>
