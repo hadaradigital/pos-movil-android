@@ -65,3 +65,28 @@ nav{padding-bottom:max(.375rem,env(safe-area-inset-bottom));}
 .text-rose-400{color:#fb7185}
 .text-sky-400{color:#38bdf8}
 @media(max-width:380px){nav{padding-left:2px;padding-right:2px}.nav-btn{min-width:52px;padding:.35rem;font-size:11px}}
+
+
+/* Ventas: adaptación al teclado virtual al editar campos del carrito. */
+html, body { min-height: 0; }
+body { height: var(--visible-app-height, 100dvh); }
+#sales-content { min-height: 0; }
+#sales-products-pane, #sales-cart-panel { min-height: 0; }
+#cart-items { overscroll-behavior: contain; }
+@media (max-width: 767px) {
+  body.keyboard-cart-mode #tab-sales { height: 100%; min-height: 0; }
+  body.keyboard-cart-mode #tab-sales #sales-content {
+    display: flex;
+    flex: 1 1 0%;
+    min-height: 0;
+    overflow: hidden;
+  }
+  body.keyboard-cart-mode #sales-products-pane { display: none; }
+  body.keyboard-cart-mode #sales-cart-panel {
+    display: flex;
+    flex: 1 1 0%;
+    width: 100%;
+    min-height: 0;
+  }
+  body.keyboard-cart-mode #cart-items { min-height: 0; }
+}

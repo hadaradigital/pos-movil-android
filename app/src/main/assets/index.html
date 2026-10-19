@@ -75,16 +75,16 @@
   </div>  
 
   <!-- Main Sales Content: Grid + Cart Split -->  
-  <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-3 overflow-hidden">  
+  <div id="sales-content" class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-3 overflow-hidden">  
     <!-- Products Grid -->  
-    <div class="overflow-y-auto no-scrollbar pr-1">  
+    <div id="sales-products-pane" class="overflow-y-auto no-scrollbar pr-1">  
       <div id="products-grid" class="grid grid-cols-2 gap-2">  
         <!-- Cards de productos -->  
       </div>  
     </div>  
 
     <!-- Cart View -->  
-    <div class="bg-slate-800 rounded-xl border border-slate-700 flex flex-col overflow-hidden shadow-xl">  
+    <div id="sales-cart-panel" class="bg-slate-800 rounded-xl border border-slate-700 flex flex-col overflow-hidden shadow-xl">  
       <div class="bg-slate-750 px-3 py-2 border-b border-slate-700 flex justify-between items-center shrink-0">  
         <span class="font-bold text-xs text-slate-200"><i class="fa-solid fa-cart-shopping mr-1"></i> Carrito</span>  
         <button onclick="clearCart()" class="text-xs text-rose-400 hover:text-rose-300 font-medium">Vaciar</button>  
@@ -450,11 +450,11 @@
   
     function renderProductsGrid() {  
       const search = (document.getElementById('search-product')?.value || '').toLowerCase();  
-      const filtered = products.filter(p => {  
-        const matchesCat = selectedCategory === 'Todos' || p.category === selectedCategory;  
-        const matchesSearch = p.name.toLowerCase().includes(search);  
-        return matchesCat && matchesSearch;  
-      });  
+      const filtered = products.filter(p => {
+        const matchesCat = selectedCategory === 'Todos' || p.category === selectedCategory;
+        const matchesSearch = String(p.name || '').toLocaleLowerCase('es-MX').includes(search);
+        return matchesCat && matchesSearch;
+      }).sort((a, b) => String(a.name || '').localeCompare(String(b.name || ''), 'es', { sensitivity: 'base', numeric: true }));  
   
       const grid = document.getElementById('products-grid');  
       grid.innerHTML = filtered.map(p => `  
@@ -1062,5 +1062,30 @@
       document.getElementById('modal-sale-detail').classList.add('hidden');  
       document.getElementById('modal-sale-detail').classList.remove('flex');  
     }  
-  </script>  <script>window.addEventListener("load", loadSavedPrinterFromAndroid);</script>  </body>  
+  </script>  <script>window.addEventListener("load", loadSavedPrinterFromAndroid);
+
+    // Al editar el carrito con el teclado abierto, ocultar temporalmente los productos.
+    (function setupCartKeyboardLayout() {
+      const cartPanel = document.getElementById('sales-cart-panel');
+      const viewport = window.visualViewport;
+      const updateViewportHeight = () => {
+        const height = viewport ? viewport.height : window.innerHeight;
+        document.documentElement.style.setProperty('--visible-app-height', `${height}px`);
+      };
+      const updateCartFocus = () => {
+        const active = document.activeElement;
+        const editingCart = active && cartPanel && cartPanel.contains(active) &&
+          (active.matches('input') || active.matches('textarea') || active.matches('select'));
+        document.body.classList.toggle('keyboard-cart-mode', Boolean(editingCart));
+      };
+      document.addEventListener('focusin', updateCartFocus);
+      document.addEventListener('focusout', () => setTimeout(updateCartFocus, 120));
+      if (viewport) {
+        viewport.addEventListener('resize', updateViewportHeight);
+        viewport.addEventListener('scroll', updateViewportHeight);
+      }
+      window.addEventListener('resize', updateViewportHeight);
+      updateViewportHeight();
+    })();
+</script>  </body>  
   </html>
