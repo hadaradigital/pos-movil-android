@@ -90,3 +90,13 @@ body { height: var(--visible-app-height, 100dvh); }
   }
   body.keyboard-cart-mode #cart-items { min-height: 0; }
 }
+
+
+/* Detalle de venta: modal limitado a la pantalla, contenido desplazable y cierre siempre visible. */
+#modal-sale-detail { overflow-y: auto; overscroll-behavior: contain; }
+#modal-sale-detail .sale-detail-dialog { display: flex; flex-direction: column; max-height: 90vh; max-height: 90dvh; min-height: 0; overflow: hidden; }
+#modal-sale-detail .sale-detail-header,
+#modal-sale-detail .sale-detail-footer { flex: 0 0 auto; background: #1e293b; }
+#modal-sale-detail .sale-detail-content { min-height: 0; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; flex: 1 1 auto; }
+#modal-sale-detail .sale-detail-header { padding-top: max(1rem, env(safe-area-inset-top)); }
+.backup-warning { line-height: 1.4; }

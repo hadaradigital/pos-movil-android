@@ -225,7 +225,8 @@
     <button onclick="backupData()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 rounded-lg text-xs">💾 Copia seguridad</button>  
     <button onclick="restoreData()" class="bg-amber-600 hover:bg-amber-500 text-white font-bold py-2 rounded-lg text-xs">♻️ Restaurar</button>  
     <div id="printer-status" class="bg-slate-900 border border-slate-700 text-slate-300 rounded-lg p-2 text-[10px] flex items-center justify-center text-center">Sin impresora</div>  
-  </div>  
+  </div>
+  <p class="backup-warning text-[10px] text-amber-300 rounded-lg p-2">Importante: antes de desinstalar la app, pulsa “Copia seguridad” y conserva el archivo. Después de instalar, usa “Restaurar”. Si solo actualizas instalando el APK encima de la versión anterior, sin desinstalarla, los datos normalmente se conservan si el paquete y la firma son los mismos.</p>
 
   <div class="space-y-3 pt-2 border-t border-slate-700">  
     <div>  
@@ -338,14 +339,18 @@
 </div>
 
   </div>    <!-- MODAL: DETALLE DE TRANSACCIÓN HISTÓRICA -->    <div id="modal-sale-detail" class="fixed inset-0 bg-black/75 hidden justify-center items-center p-3 z-50">  
-    <div class="bg-slate-800 border border-slate-700 w-full max-w-sm rounded-2xl p-4 space-y-3 shadow-2xl">  
-      <div class="flex justify-between items-center border-b border-slate-700 pb-2">  
+    <div class="sale-detail-dialog bg-slate-800 border border-slate-700 w-full max-w-sm rounded-2xl shadow-2xl">  
+      <div class="sale-detail-header flex justify-between items-center border-b border-slate-700 p-4">  
         <h3 class="font-bold text-base">Detalle de Venta</h3>  
-        <button onclick="closeSaleDetailModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>  
-      </div>  <div id="sale-detail-content" class="text-xs space-y-2">  
-    <!-- Detalle cargado por JS -->  
-  </div>  
-</div>
+        <button onclick="closeSaleDetailModal()" aria-label="Cerrar detalle de venta" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>  
+      </div>  
+      <div id="sale-detail-content" class="sale-detail-content text-xs space-y-2 p-4">  
+        <!-- Detalle cargado por JS -->  
+      </div>
+      <div class="sale-detail-footer p-3 border-t border-slate-700">
+        <button onclick="closeSaleDetailModal()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 rounded-lg text-xs">Cerrar ticket</button>
+      </div>
+    </div>
 
   </div>    <!-- HIDDEN PRINT CONTAINER -->    <div id="ticket-print-area" class="hidden"></div>    <!-- JAVASCRIPT LOGIC -->    <script>  
     let products = JSON.parse(localStorage.getItem('pos_products')) || [  
