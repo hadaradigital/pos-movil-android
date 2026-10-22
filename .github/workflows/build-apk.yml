@@ -23,10 +23,6 @@ jobs:
         with:
           gradle-version: '8.7'
 
-      - name: Decodificar Keystore
-        run: |
-          echo "${{ secrets.SIGNING_KEY }}" | tr -d '\n' | base64 -d > app/release-key.jks
-          
       - name: Compilar APK Firmado
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
