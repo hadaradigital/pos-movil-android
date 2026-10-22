@@ -23,6 +23,9 @@ jobs:
         with:
           gradle-version: '8.7'
 
+      - name: Generar Wrapper de Gradle faltante
+        run: gradle wrapper --gradle-version 8.7
+
       - name: Compilar APK Firmado
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
