@@ -438,14 +438,21 @@
     }  
   
     function renderCategoriesBar() {  
-      const cats = ['Todos', ...new Set(products.map(p => p.category))];  
+      // Obtenemos las categorías únicas de los productos y las ordenamos alfabéticamente en español
+      const uniqueCategories = [...new Set(products.map(p => p.category))].sort((a, b) => 
+        String(a).localeCompare(String(b), 'es', { sensitivity: 'base' })
+      );
+      
+      // 'Todos' se queda siempre al principio, seguido de las categorías ordenadas alfabéticamente
+      const cats = ['Todos', ...uniqueCategories];  
+      
       const container = document.getElementById('categories-bar');  
       container.innerHTML = cats.map(c => `  
         <button onclick="filterCategory('${c}')" class="px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition ${selectedCategory === c ? 'bg-indigo-600 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}">  
           ${c}  
         </button>  
       `).join('');  
-    }  
+    }
   
     function filterCategory(cat) {  
       selectedCategory = cat;  
