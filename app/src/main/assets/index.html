@@ -1043,12 +1043,14 @@
   
     let activeHistoricalSaleId = null;
     let historicalSaleEditMode = false;
+    let historicalSaleDraft = null;
 
     function openSaleDetailModal(saleId) {
       const sale = sales.find(s => String(s.id) === String(saleId));
       if (!sale) return;
       activeHistoricalSaleId = String(sale.id);
       historicalSaleEditMode = false;
+      historicalSaleDraft = null;
       renderHistoricalSaleDetail(sale);
       document.getElementById('modal-sale-detail').classList.remove('hidden');
       document.getElementById('modal-sale-detail').classList.add('flex');
@@ -1063,7 +1065,8 @@
         const price = Number(item.price) || 0;
         if (editMode) return `
           <div class="bg-slate-900 border border-slate-700 rounded-lg p-2 space-y-1.5">
-            <label class="block text-slate-400">Producto</label>
+            <div class="flex items-center justify-between gap-2"><label class="block text-slate-400">Producto ${index + 1}</label><button type="button" onclick="removeHistoricalSaleItem(${index})" class="text-rose-400 px-2 py-1 rounded bg-slate-800 text-xs">Quitar</button></div>
+            <label class="block text-slate-400">Nombre</label>
             <input data-sale-item="${index}" data-field="name" value="${escapeHtml(item.name || '')}" class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-white text-xs">
             <div class="grid grid-cols-3 gap-1.5">
               <div><label class="block text-slate-400">Cantidad</label><input data-sale-item="${index}" data-field="qty" type="number" min="0.001" step="any" value="${qty}" class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-white text-xs"></div>
@@ -1077,6 +1080,7 @@
             <span class="font-bold text-emerald-400 whitespace-nowrap">$${(qty * price).toFixed(2)}</span>
           </div>`;
       }).join('');
+      const productOptions = products.slice().sort((a,b) => String(a.name||'').localeCompare(String(b.name||''),'es',{sensitivity:'base',numeric:true})).map(p => `<option value="${escapeHtml(p.id)}">${escapeHtml(p.name)} (${escapeHtml(p.unit || 'pza')})</option>`).join('');
 
       container.innerHTML = `
         <div class="bg-slate-900 p-2.5 rounded-lg border border-slate-700 space-y-2">
@@ -1089,9 +1093,18 @@
             <div class="flex justify-between gap-2"><span class="text-slate-400">Método de pago:</span><span class="text-white">${escapeHtml(method)}</span></div>
           `}
         </div>
-        <div class="space-y-1"><p class="font-bold text-slate-300">Artículos vendidos:</p><div class="divide-y divide-slate-700 bg-slate-900/50 rounded-lg p-2 border border-slate-700">${itemsHTML || '<p class="text-slate-400 p-2">Esta venta no tiene artículos.</p>'}</div></div>
-        <div class="flex justify-between bg-slate-900 p-2.5 rounded-lg border border-slate-700 font-bold"><span class="text-slate-300">Total de venta:</span><span class="text-emerald-400">$${(Number(sale.total)||0).toFixed(2)}</span></div>
-        ${editMode ? '<p class="text-amber-300 text-[10px]">Al guardar se actualizarán los datos históricos de esta venta. No se modifica el inventario.</p>' : ''}
+        <div class="space-y-1"><p class="font-bold text-slate-300">Artículos vendidos:</p><div class="divide-y divide-slate-700 bg-slate-900/50 rounded-lg p-2 border border-slate-700 space-y-2">${itemsHTML || '<p class="text-slate-400 p-2">Esta venta no tiene artículos.</p>'}</div></div>
+        ${editMode ? `
+          <div class="bg-slate-900 border border-indigo-700 rounded-lg p-2.5 space-y-2">
+            <p class="font-bold text-indigo-300">Agregar producto a este mismo ticket</p>
+            <label class="block text-slate-400">Producto del catálogo</label>
+            <select id="historical-add-product" onchange="fillHistoricalProductPrice()" class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-white text-xs"><option value="">Selecciona un producto…</option>${productOptions}</select>
+            <div class="grid grid-cols-2 gap-2"><div><label class="block text-slate-400">Cantidad</label><input id="historical-add-qty" type="number" min="0.001" step="any" value="1" class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-white text-xs"></div><div><label class="block text-slate-400">Precio unitario ($)</label><input id="historical-add-price" type="number" min="0" step="any" class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-emerald-300 text-xs"></div></div>
+            <button type="button" onclick="addProductToHistoricalSale()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 rounded-lg text-xs"><i class="fa-solid fa-plus mr-1"></i>Agregar al ticket</button>
+          </div>
+        ` : ''}
+        <div class="flex justify-between bg-slate-900 p-2.5 rounded-lg border border-slate-700 font-bold"><span class="text-slate-300">Total de venta:</span><span class="text-emerald-400">$${safeItems.reduce((sum,item)=>sum+(Number(item.qty)||0)*(Number(item.price)||0),0).toFixed(2)}</span></div>
+        ${editMode ? '<p class="text-amber-300 text-[10px]">Al guardar se actualizará el historial y los reportes. No se modifica inventario.</p>' : ''}
       `;
       const actions = document.getElementById('sale-detail-actions');
       if (actions) actions.innerHTML = editMode ? `
@@ -1108,60 +1121,113 @@
     function editHistoricalSale() {
       const sale = sales.find(s => String(s.id) === String(activeHistoricalSaleId));
       if (!sale) return;
+      historicalSaleDraft = JSON.parse(JSON.stringify(sale));
       historicalSaleEditMode = true;
-      renderHistoricalSaleDetail(sale, true);
+      renderHistoricalSaleDetail(historicalSaleDraft, true);
+    }
+
+    function readHistoricalSaleForm() {
+      if (!historicalSaleDraft) return false;
+      const customerInput = document.getElementById('historical-sale-customer');
+      const methodInput = document.getElementById('historical-sale-method');
+      const updatedItems = (historicalSaleDraft.items || []).map((item, index) => {
+        const read = field => document.querySelector(`[data-sale-item="${index}"][data-field="${field}"]`)?.value;
+        const name = String(read('name') ?? item.name ?? '').trim();
+        const qty = Number(read('qty') ?? item.qty);
+        const unit = String(read('unit') ?? item.unit ?? 'pza').trim();
+        const price = Number(read('price') ?? item.price);
+        if (!name || !Number.isFinite(qty) || qty <= 0 || !Number.isFinite(price) || price < 0 || !unit) return null;
+        return {...item, name, qty, unit, price};
+      });
+      if (updatedItems.some(item => !item)) {
+        alert('Revisa los artículos: nombre y unidad son obligatorios, la cantidad debe ser mayor que cero y el precio no puede ser negativo.');
+        return false;
+      }
+      const customer = customerInput?.value.trim();
+      if (!customer) { alert('Escribe el nombre del cliente.'); return false; }
+      historicalSaleDraft.customer = customer;
+      historicalSaleDraft.method = methodInput?.value || historicalSaleDraft.method || 'Efectivo';
+      historicalSaleDraft.items = updatedItems;
+      historicalSaleDraft.total = updatedItems.reduce((sum, item) => sum + Number(item.qty) * Number(item.price), 0);
+      return true;
+    }
+
+    function fillHistoricalProductPrice() {
+      const id = document.getElementById('historical-add-product')?.value;
+      const product = products.find(p => String(p.id) === String(id));
+      const price = document.getElementById('historical-add-price');
+      if (product && price) price.value = product.lastPrice !== undefined ? product.lastPrice : product.price;
+    }
+
+    function addProductToHistoricalSale() {
+      if (!readHistoricalSaleForm()) return;
+      const id = document.getElementById('historical-add-product')?.value;
+      const qty = Number(document.getElementById('historical-add-qty')?.value);
+      const price = Number(document.getElementById('historical-add-price')?.value);
+      const product = products.find(p => String(p.id) === String(id));
+      if (!product) { alert('Selecciona un producto del catálogo.'); return; }
+      if (!Number.isFinite(qty) || qty <= 0 || !Number.isFinite(price) || price < 0) { alert('Revisa la cantidad y el precio del producto nuevo.'); return; }
+      historicalSaleDraft.items.push({id:product.id, name:product.name, unit:product.unit || 'pza', qty, price});
+      renderHistoricalSaleDetail(historicalSaleDraft, true);
+      alert(`${product.name} se agregó al ticket. Pulsa “Guardar cambios” para actualizar la venta y sus reportes.`);
+    }
+
+    function removeHistoricalSaleItem(index) {
+      if (!readHistoricalSaleForm()) return;
+      if (!historicalSaleDraft.items || index < 0 || index >= historicalSaleDraft.items.length) return;
+      if (historicalSaleDraft.items.length <= 1) { alert('La venta debe conservar al menos un producto.'); return; }
+      historicalSaleDraft.items.splice(index, 1);
+      renderHistoricalSaleDetail(historicalSaleDraft, true);
     }
 
     function cancelHistoricalSaleEdit() {
       const sale = sales.find(s => String(s.id) === String(activeHistoricalSaleId));
       if (!sale) return;
+      historicalSaleDraft = null;
       historicalSaleEditMode = false;
       renderHistoricalSaleDetail(sale, false);
     }
 
     function saveHistoricalSaleChanges() {
-      const sale = sales.find(s => String(s.id) === String(activeHistoricalSaleId));
-      if (!sale) return;
-      const customerInput = document.getElementById('historical-sale-customer');
-      const methodInput = document.getElementById('historical-sale-method');
-      const updatedItems = (sale.items || []).map((item, index) => {
-        const read = field => document.querySelector(`[data-sale-item="${index}"][data-field="${field}"]`)?.value;
-        const name = String(read('name') ?? item.name ?? '').trim();
-        const qty = Number(read('qty'));
-        const unit = String(read('unit') ?? item.unit ?? 'pza').trim();
-        const price = Number(read('price'));
-        if (!name || !Number.isFinite(qty) || qty <= 0 || !Number.isFinite(price) || price < 0 || !unit) return null;
-        return {...item, name, qty, unit, price};
-      });
-      if (updatedItems.some(item => !item)) {
-        alert('Revisa los artículos: el nombre y la unidad son obligatorios, la cantidad debe ser mayor que cero y el precio no puede ser negativo.');
-        return;
+      if (!readHistoricalSaleForm()) return;
+      if (!historicalSaleDraft.items.length || historicalSaleDraft.items.some(item => !String(item.name||'').trim())) {
+        alert('La venta debe tener al menos un producto válido.'); return;
       }
-      const customer = customerInput?.value.trim();
-      if (!customer) { alert('Escribe el nombre del cliente.'); return; }
-      sale.customer = customer;
-      sale.method = methodInput?.value || sale.method || 'Efectivo';
-      sale.items = updatedItems;
-      sale.total = updatedItems.reduce((sum, item) => sum + (Number(item.qty) * Number(item.price)), 0);
+      const index = sales.findIndex(s => String(s.id) === String(activeHistoricalSaleId));
+      if (index < 0) { alert('No se encontró la venta original.'); return; }
+      sales[index] = JSON.parse(JSON.stringify(historicalSaleDraft));
       localStorage.setItem('pos_sales', JSON.stringify(sales));
+      const updatedSale = sales[index];
+      historicalSaleDraft = null;
       historicalSaleEditMode = false;
       renderReports();
       renderCustomers();
       refreshCustomerSuggestions();
-      renderHistoricalSaleDetail(sale, false);
-      alert('Venta actualizada correctamente. El inventario no se modificó.');
+      renderHistoricalSaleDetail(updatedSale, false);
+      alert('Venta actualizada correctamente. El total y los reportes ya reflejan los cambios.');
     }
 
     function deleteHistoricalSale() {
       const sale = sales.find(s => String(s.id) === String(activeHistoricalSaleId));
-      if (!sale) return;
-      if (!confirm(`¿Eliminar definitivamente la venta de ${sale.customer || 'Cliente Frecuente'} por $${(Number(sale.total)||0).toFixed(2)}? Esta acción no se puede deshacer.`)) return;
-      sales = sales.filter(s => String(s.id) !== String(activeHistoricalSaleId));
-      localStorage.setItem('pos_sales', JSON.stringify(sales));
-      closeSaleDetailModal();
-      renderReports();
-      renderCustomers();
-      alert('Venta eliminada del historial. El inventario no se modificó.');
+      if (!sale) { alert('No se encontró la venta que intentas eliminar.'); return; }
+      const confirmLayer = document.createElement('div');
+      confirmLayer.className = 'fixed inset-0 bg-black/80 flex justify-center items-center p-4 z-[100]';
+      confirmLayer.innerHTML = `<div class="w-full max-w-xs bg-slate-800 border border-rose-700 rounded-xl p-4 space-y-3 shadow-2xl"><h3 class="font-bold text-white">¿Eliminar esta venta?</h3><p class="text-xs text-slate-300">Se eliminará el ticket de <b>${escapeHtml(sale.customer || 'Cliente Frecuente')}</b> por <b>$${(Number(sale.total)||0).toFixed(2)}</b> y se actualizarán los reportes. No se puede deshacer.</p><div class="grid grid-cols-2 gap-2"><button id="confirm-delete-sale-yes" class="bg-rose-600 text-white font-bold py-2 rounded-lg text-xs">Sí, eliminar</button><button id="confirm-delete-sale-no" class="bg-slate-700 text-white font-bold py-2 rounded-lg text-xs">Cancelar</button></div></div>`;
+      document.body.appendChild(confirmLayer);
+      document.getElementById('confirm-delete-sale-no').onclick = () => confirmLayer.remove();
+      document.getElementById('confirm-delete-sale-yes').onclick = () => {
+        const before = sales.length;
+        sales = sales.filter(s => String(s.id) !== String(activeHistoricalSaleId));
+        if (sales.length === before) { confirmLayer.remove(); alert('No se pudo localizar la venta; no se eliminó ningún registro.'); return; }
+        localStorage.setItem('pos_sales', JSON.stringify(sales));
+        confirmLayer.remove();
+        historicalSaleDraft = null;
+        closeSaleDetailModal();
+        renderReports();
+        renderCustomers();
+        refreshCustomerSuggestions();
+        alert('Venta eliminada correctamente. El libro de ventas y los reportes se actualizaron.');
+      };
     }
 
     function reprintHistoricalSale() {
@@ -1173,6 +1239,8 @@
     function closeSaleDetailModal() {  
       document.getElementById('modal-sale-detail').classList.add('hidden');  
       document.getElementById('modal-sale-detail').classList.remove('flex');  
+      historicalSaleDraft = null;
+      historicalSaleEditMode = false;
     }  
   </script>  <script>window.addEventListener("load", loadSavedPrinterFromAndroid);
 
