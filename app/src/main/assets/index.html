@@ -116,7 +116,7 @@
 </section>  
 
 <!-- SECTION 2: PRODUCTOS -->  
-<section id="tab-inventory" class="tab-section h-full flex-col p-3 space-y-3 overflow-y-auto">  
+<section id="tab-inventory" class="tab-section h-full flex-col p-3 space-y-3">  
   <div class="flex justify-between items-center shrink-0">  
     <button onclick="openProductModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-3 py-2 rounded-lg flex items-center space-x-1 shadow">  
       <i class="fa-solid fa-plus"></i>  
@@ -124,8 +124,8 @@
     </button>  
   </div>  
 
-  <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden shadow-md">  
-    <div class="overflow-x-auto">  
+  <div id="products-table-card" class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden shadow-md">  
+    <div id="products-table-scroll" class="overflow-x-auto">  
       <table class="w-full text-left text-xs">  
         <thead class="bg-slate-900 text-slate-400 border-b border-slate-700">  
           <tr>  
@@ -809,7 +809,8 @@
   
     function renderInventory() {  
       const tbody = document.getElementById('inventory-table-body');  
-      tbody.innerHTML = products.map(p => `  
+      const sortedProducts = [...products].sort((a, b) => String(a.name || '').localeCompare(String(b.name || ''), 'es', { sensitivity: 'base', numeric: true }));
+      tbody.innerHTML = sortedProducts.map(p => `  
         <tr>  
           <td class="p-3 font-bold text-white">${escapeHtml(p.name)}</td>  
           <td class="p-3 text-slate-400">${escapeHtml(p.category)}</td>  
@@ -900,6 +901,8 @@
     }  
   
     function saveProductsToStorage() {  
+      // Mantener también el arreglo guardado en orden alfabético tras agregar, editar o eliminar.
+      products.sort((a, b) => String(a.name || '').localeCompare(String(b.name || ''), 'es', { sensitivity: 'base', numeric: true }));
       localStorage.setItem('pos_products', JSON.stringify(products));  
     }  
   

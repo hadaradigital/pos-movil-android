@@ -100,3 +100,11 @@ body { height: var(--visible-app-height, 100dvh); }
 #modal-sale-detail .sale-detail-content { min-height: 0; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; flex: 1 1 auto; }
 #modal-sale-detail .sale-detail-header { padding-top: max(1rem, env(safe-area-inset-top)); }
 .backup-warning { line-height: 1.4; }
+
+
+/* Productos: scroll vertical independiente y estable en Android WebView. */
+#tab-inventory { min-height: 0; overflow: hidden; }
+#products-table-card { flex: 1 1 0%; min-height: 0; }
+#products-table-scroll { height: 100%; min-height: 0; overflow: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; touch-action: pan-y pan-x; }
+#products-table-scroll table { min-width: 100%; }
+#inventory-table-body tr { position: relative; }
