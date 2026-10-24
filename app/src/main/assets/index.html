@@ -340,11 +340,14 @@
         <h3 class="font-bold text-base">Detalle de Venta</h3>  
         <button onclick="closeSaleDetailModal()" aria-label="Cerrar detalle de venta" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>  
       </div>  
-      <div id="sale-detail-content" class="sale-detail-content text-xs space-y-2 p-4">  
-        <!-- Detalle cargado por JS -->  
+      <div id="sale-detail-content" class="sale-detail-content text-xs space-y-2 p-4">
+        <!-- Detalle cargado por JS -->
       </div>
-      <div class="sale-detail-footer p-3 border-t border-slate-700">
-        <button onclick="closeSaleDetailModal()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 rounded-lg text-xs">Cerrar ticket</button>
+      <div id="sale-detail-actions" class="sale-detail-footer p-3 border-t border-slate-700 grid grid-cols-2 gap-2">
+        <button onclick="editHistoricalSale()" class="bg-amber-600 hover:bg-amber-500 text-white font-bold py-2 rounded-lg text-xs"><i class="fa-solid fa-pen mr-1"></i>Modificar</button>
+        <button onclick="reprintHistoricalSale()" class="bg-sky-600 hover:bg-sky-500 text-white font-bold py-2 rounded-lg text-xs"><i class="fa-solid fa-print mr-1"></i>Reimprimir</button>
+        <button onclick="deleteHistoricalSale()" class="bg-rose-600 hover:bg-rose-500 text-white font-bold py-2 rounded-lg text-xs"><i class="fa-solid fa-trash mr-1"></i>Eliminar venta</button>
+        <button onclick="closeSaleDetailModal()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 rounded-lg text-xs">Cerrar</button>
       </div>
     </div>
 
@@ -1038,41 +1041,135 @@
       return String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));  
     }  
   
-    function openSaleDetailModal(saleId) {  
-      const sale = sales.find(s => s.id === saleId);  
-      if (!sale) return;  
-  
-      const container = document.getElementById('sale-detail-content');  
-      container.innerHTML = `  
-        <div class="bg-slate-900 p-2.5 rounded-lg border border-slate-700 space-y-1">  
-          <div class="flex justify-between"><span class="text-slate-400">Fecha:</span><span class="text-white">${sale.dateFormatted}</span></div>  
-          <div class="flex justify-between"><span class="text-slate-400">Cliente:</span><span class="text-white font-bold">${escapeHtml(sale.customer || 'Cliente Frecuente')}</span></div>  
-          <div class="flex justify-between"><span class="text-slate-400">Método Pago:</span><span class="text-white">${sale.method}</span></div>  
-        </div>  
-  
-        <div class="space-y-1">  
-          <p class="font-bold text-slate-300">Artículos Vendidos:</p>  
-          <div class="divide-y divide-slate-700 bg-slate-900/50 rounded-lg p-2 border border-slate-700">  
-            ${sale.items.map(i => `  
-              <div class="py-1 flex justify-between items-center">  
-                <div>  
-                  <p class="font-bold text-white">${escapeHtml(i.name)}</p>  
-                  <p class="text-[10px] text-slate-400">${i.qty}${i.unit} x $${i.price.toFixed(2)}</p> </div> <span class="font-bold text-emerald-400">$${(i.qty * i.price).toFixed(2)}</span>  
-              </div>  
-            `).join('')}  
-          </div>  
-        </div>  
-  
-        <div class="flex justify-between bg-slate-900 p-2.5 rounded-lg border border-slate-700 font-bold">  
-          <span class="text-slate-300">Total Transacción:</span>  
-          <span class="text-emerald-400">$${sale.total.toFixed(2)}</span>  
-        </div>  
-      `;  
-  
-      document.getElementById('modal-sale-detail').classList.remove('hidden');  
-      document.getElementById('modal-sale-detail').classList.add('flex');  
-    }  
-  
+    let activeHistoricalSaleId = null;
+    let historicalSaleEditMode = false;
+
+    function openSaleDetailModal(saleId) {
+      const sale = sales.find(s => String(s.id) === String(saleId));
+      if (!sale) return;
+      activeHistoricalSaleId = String(sale.id);
+      historicalSaleEditMode = false;
+      renderHistoricalSaleDetail(sale);
+      document.getElementById('modal-sale-detail').classList.remove('hidden');
+      document.getElementById('modal-sale-detail').classList.add('flex');
+    }
+
+    function renderHistoricalSaleDetail(sale, editMode = false) {
+      const container = document.getElementById('sale-detail-content');
+      const safeItems = Array.isArray(sale.items) ? sale.items : [];
+      const method = sale.method || 'Efectivo';
+      const itemsHTML = safeItems.map((item, index) => {
+        const qty = Number(item.qty) || 0;
+        const price = Number(item.price) || 0;
+        if (editMode) return `
+          <div class="bg-slate-900 border border-slate-700 rounded-lg p-2 space-y-1.5">
+            <label class="block text-slate-400">Producto</label>
+            <input data-sale-item="${index}" data-field="name" value="${escapeHtml(item.name || '')}" class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-white text-xs">
+            <div class="grid grid-cols-3 gap-1.5">
+              <div><label class="block text-slate-400">Cantidad</label><input data-sale-item="${index}" data-field="qty" type="number" min="0.001" step="any" value="${qty}" class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-white text-xs"></div>
+              <div><label class="block text-slate-400">Unidad</label><input data-sale-item="${index}" data-field="unit" value="${escapeHtml(item.unit || 'pza')}" class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-white text-xs"></div>
+              <div><label class="block text-slate-400">Precio unit.</label><input data-sale-item="${index}" data-field="price" type="number" min="0" step="any" value="${price}" class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-emerald-300 text-xs"></div>
+            </div>
+          </div>`;
+        return `
+          <div class="py-2 flex justify-between items-center gap-2">
+            <div class="min-w-0"><p class="font-bold text-white">${escapeHtml(item.name || 'Producto')}</p><p class="text-[10px] text-slate-400">${qty} ${escapeHtml(item.unit || '')} × $${price.toFixed(2)}</p></div>
+            <span class="font-bold text-emerald-400 whitespace-nowrap">$${(qty * price).toFixed(2)}</span>
+          </div>`;
+      }).join('');
+
+      container.innerHTML = `
+        <div class="bg-slate-900 p-2.5 rounded-lg border border-slate-700 space-y-2">
+          <div class="flex justify-between gap-2"><span class="text-slate-400">Fecha:</span><span class="text-white">${escapeHtml(sale.dateFormatted || sale.dateIso || '')}</span></div>
+          ${editMode ? `
+            <div><label class="block text-slate-400 mb-1">Cliente</label><input id="historical-sale-customer" value="${escapeHtml(sale.customer || 'Cliente Frecuente')}" class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-white text-xs"></div>
+            <div><label class="block text-slate-400 mb-1">Método de pago</label><select id="historical-sale-method" class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-white text-xs"><option ${method==='Efectivo'?'selected':''}>Efectivo</option><option ${method==='Tarjeta'?'selected':''}>Tarjeta</option><option ${method==='Transferencia'?'selected':''}>Transferencia</option><option ${method==='Transferencia bancaria'?'selected':''}>Transferencia bancaria</option></select></div>
+          ` : `
+            <div class="flex justify-between gap-2"><span class="text-slate-400">Cliente:</span><span class="text-white font-bold text-right">${escapeHtml(sale.customer || 'Cliente Frecuente')}</span></div>
+            <div class="flex justify-between gap-2"><span class="text-slate-400">Método de pago:</span><span class="text-white">${escapeHtml(method)}</span></div>
+          `}
+        </div>
+        <div class="space-y-1"><p class="font-bold text-slate-300">Artículos vendidos:</p><div class="divide-y divide-slate-700 bg-slate-900/50 rounded-lg p-2 border border-slate-700">${itemsHTML || '<p class="text-slate-400 p-2">Esta venta no tiene artículos.</p>'}</div></div>
+        <div class="flex justify-between bg-slate-900 p-2.5 rounded-lg border border-slate-700 font-bold"><span class="text-slate-300">Total de venta:</span><span class="text-emerald-400">$${(Number(sale.total)||0).toFixed(2)}</span></div>
+        ${editMode ? '<p class="text-amber-300 text-[10px]">Al guardar se actualizarán los datos históricos de esta venta. No se modifica el inventario.</p>' : ''}
+      `;
+      const actions = document.getElementById('sale-detail-actions');
+      if (actions) actions.innerHTML = editMode ? `
+        <button onclick="saveHistoricalSaleChanges()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 rounded-lg text-xs"><i class="fa-solid fa-check mr-1"></i>Guardar cambios</button>
+        <button onclick="cancelHistoricalSaleEdit()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 rounded-lg text-xs">Cancelar</button>
+      ` : `
+        <button onclick="editHistoricalSale()" class="bg-amber-600 hover:bg-amber-500 text-white font-bold py-2 rounded-lg text-xs"><i class="fa-solid fa-pen mr-1"></i>Modificar</button>
+        <button onclick="reprintHistoricalSale()" class="bg-sky-600 hover:bg-sky-500 text-white font-bold py-2 rounded-lg text-xs"><i class="fa-solid fa-print mr-1"></i>Reimprimir</button>
+        <button onclick="deleteHistoricalSale()" class="bg-rose-600 hover:bg-rose-500 text-white font-bold py-2 rounded-lg text-xs"><i class="fa-solid fa-trash mr-1"></i>Eliminar venta</button>
+        <button onclick="closeSaleDetailModal()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 rounded-lg text-xs">Cerrar</button>
+      `;
+    }
+
+    function editHistoricalSale() {
+      const sale = sales.find(s => String(s.id) === String(activeHistoricalSaleId));
+      if (!sale) return;
+      historicalSaleEditMode = true;
+      renderHistoricalSaleDetail(sale, true);
+    }
+
+    function cancelHistoricalSaleEdit() {
+      const sale = sales.find(s => String(s.id) === String(activeHistoricalSaleId));
+      if (!sale) return;
+      historicalSaleEditMode = false;
+      renderHistoricalSaleDetail(sale, false);
+    }
+
+    function saveHistoricalSaleChanges() {
+      const sale = sales.find(s => String(s.id) === String(activeHistoricalSaleId));
+      if (!sale) return;
+      const customerInput = document.getElementById('historical-sale-customer');
+      const methodInput = document.getElementById('historical-sale-method');
+      const updatedItems = (sale.items || []).map((item, index) => {
+        const read = field => document.querySelector(`[data-sale-item="${index}"][data-field="${field}"]`)?.value;
+        const name = String(read('name') ?? item.name ?? '').trim();
+        const qty = Number(read('qty'));
+        const unit = String(read('unit') ?? item.unit ?? 'pza').trim();
+        const price = Number(read('price'));
+        if (!name || !Number.isFinite(qty) || qty <= 0 || !Number.isFinite(price) || price < 0 || !unit) return null;
+        return {...item, name, qty, unit, price};
+      });
+      if (updatedItems.some(item => !item)) {
+        alert('Revisa los artículos: el nombre y la unidad son obligatorios, la cantidad debe ser mayor que cero y el precio no puede ser negativo.');
+        return;
+      }
+      const customer = customerInput?.value.trim();
+      if (!customer) { alert('Escribe el nombre del cliente.'); return; }
+      sale.customer = customer;
+      sale.method = methodInput?.value || sale.method || 'Efectivo';
+      sale.items = updatedItems;
+      sale.total = updatedItems.reduce((sum, item) => sum + (Number(item.qty) * Number(item.price)), 0);
+      localStorage.setItem('pos_sales', JSON.stringify(sales));
+      historicalSaleEditMode = false;
+      renderReports();
+      renderCustomers();
+      refreshCustomerSuggestions();
+      renderHistoricalSaleDetail(sale, false);
+      alert('Venta actualizada correctamente. El inventario no se modificó.');
+    }
+
+    function deleteHistoricalSale() {
+      const sale = sales.find(s => String(s.id) === String(activeHistoricalSaleId));
+      if (!sale) return;
+      if (!confirm(`¿Eliminar definitivamente la venta de ${sale.customer || 'Cliente Frecuente'} por $${(Number(sale.total)||0).toFixed(2)}? Esta acción no se puede deshacer.`)) return;
+      sales = sales.filter(s => String(s.id) !== String(activeHistoricalSaleId));
+      localStorage.setItem('pos_sales', JSON.stringify(sales));
+      closeSaleDetailModal();
+      renderReports();
+      renderCustomers();
+      alert('Venta eliminada del historial. El inventario no se modificó.');
+    }
+
+    function reprintHistoricalSale() {
+      const sale = sales.find(s => String(s.id) === String(activeHistoricalSaleId));
+      if (!sale) return;
+      printTicket(sale);
+    }
+
     function closeSaleDetailModal() {  
       document.getElementById('modal-sale-detail').classList.add('hidden');  
       document.getElementById('modal-sale-detail').classList.remove('flex');  
