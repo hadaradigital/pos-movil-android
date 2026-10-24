@@ -63,16 +63,12 @@
     </div>  
   </header>    <main class="flex-1 overflow-hidden relative">  <!-- SECTION 1: VENTAS (POS) -->  
 <section id="tab-sales" class="tab-section active h-full flex-col p-3 space-y-3">  
-  <!-- Search & Category Filters -->  
-  <div class="space-y-2 shrink-0">  
-    <div class="relative">  
-      <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400 text-xs"></i>  
-      <input type="text" id="search-product" placeholder="Buscar producto..." class="w-full bg-slate-800 border border-slate-700 rounded-xl pl-9 pr-4 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">  
-    </div>  
-    <div id="categories-bar" class="flex space-x-2 overflow-x-auto no-scrollbar py-1">  
-      <!-- Categorías -->  
-    </div>  
-  </div>  
+  <!-- Category Filters (búsqueda eliminada para dar más espacio al carrito) -->
+  <div class="shrink-0">
+    <div id="categories-bar" class="flex space-x-2 overflow-x-auto no-scrollbar py-1">
+      <!-- Categorías -->
+    </div>
+  </div>
 
   <!-- Main Sales Content: Grid + Cart Split -->  
   <div id="sales-content" class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-3 overflow-hidden">  
@@ -461,13 +457,10 @@
     }  
   
     function renderProductsGrid() {  
-      const search = (document.getElementById('search-product')?.value || '').toLowerCase();  
-      const filtered = products.filter(p => {
-        const matchesCat = selectedCategory === 'Todos' || p.category === selectedCategory;
-        const matchesSearch = String(p.name || '').toLocaleLowerCase('es-MX').includes(search);
-        return matchesCat && matchesSearch;
-      }).sort((a, b) => String(a.name || '').localeCompare(String(b.name || ''), 'es', { sensitivity: 'base', numeric: true }));  
-  
+      const filtered = products.filter(p =>
+        selectedCategory === 'Todos' || p.category === selectedCategory
+      ).sort((a, b) => String(a.name || '').localeCompare(String(b.name || ''), 'es', { sensitivity: 'base', numeric: true }));
+
       const grid = document.getElementById('products-grid');  
       grid.innerHTML = filtered.map(p => `  
         <div onclick="addToCart('${p.id}')" class="bg-slate-800 border border-slate-700 p-3 rounded-xl flex items-center justify-center cursor-pointer active:scale-95 transition shadow-sm text-center min-h-[55px]">  
@@ -475,9 +468,6 @@
         </div>  
       `).join('');  
     }  
-  
-    const searchInput = document.getElementById('search-product');  
-    if (searchInput) searchInput.addEventListener('input', renderProductsGrid);  
   
     function addToCart(productId) {  
       const prod = products.find(p => p.id === productId);  
@@ -987,10 +977,20 @@
       }  
     }  
   
-    function refreshCustomerSuggestions(){  
-      const dl=document.getElementById('customer-suggestions'); if(!dl)return;  
-      dl.innerHTML=customers.map(c=>`<option value="${escapeHtml(c.name)}"></option>`).join('');  
-    }  
+    function refreshCustomerSuggestions() {
+      const dl = document.getElementById('customer-suggestions');
+      if (!dl) return;
+      // Mostrar los nombres sugeridos en orden alfabético.
+      const sortedCustomers = [...customers].sort((a, b) =>
+        String(a.name || '').localeCompare(String(b.name || ''), 'es', {
+          sensitivity: 'base',
+          numeric: true
+        })
+      );
+      dl.innerHTML = sortedCustomers
+        .map(c => `<option value="${escapeHtml(c.name || '')}"></option>`)
+        .join('');
+    }
     function upsertCustomerFromSale(name){  
       const key=name.trim().toLocaleLowerCase('es-MX');  
       let c=customers.find(x=>(x.name||'').trim().toLocaleLowerCase('es-MX')===key);  
